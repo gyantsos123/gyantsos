@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCMC Cardiac Centre - Salesforce Data Model</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-light: #e6f0fa;
+            --secondary: #2d3748;
+            --accent: #38a169;
+            --warning: #dd6b20;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0066cc 0%, #004999 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+
+        header .container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        .card p {
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        /* Diagram Container */
+        .diagram-container {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 2rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        li strong {
+            color: var(--secondary);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-standard { background: #e6f0fa; color: #0066cc; }
+        .badge-custom { background: #e6ffed; color: #22543d; }
+        .badge-external { background: #fef3e6; color: #9c4221; }
+        .badge-phase1 { background: #e9d8fd; color: #553c9a; }
+        .badge-phase2 { background: #fed7d7; color: #c53030; }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .grid-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .grid-item p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* Callout */
+        .callout {
+            background: linear-gradient(135deg, #e6f0fa 0%, #ebf4ff 100%);
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .callout-warning {
+            background: linear-gradient(135deg, #fffaf0 0%, #fef3e6 100%);
+            border-left-color: var(--warning);
+        }
+
+        .callout-success {
+            background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+            border-left-color: var(--accent);
+        }
+
+        .callout p {
+            margin: 0;
+        }
+
+        /* Code */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #edf2f7;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: #c53030;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 0.625rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">&#x2764;</div>
+            <div>
+                <h1>KCMC Cardiac Centre</h1>
+                <p>Salesforce Data Model for Pediatric Cardiac Care in Tanzania</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Project Overview -->
+        <section class="card">
+            <h2>Project Overview</h2>
+            <p>
+                The <strong>Foundation for Cardiovascular Care in Africa (FCCA)</strong> is building a new Cardiac Centre 
+                at the <strong>Kilimanjaro Christian Medical Center (KCMC)</strong> in Tanzania, expected to open in 2027. 
+                This Salesforce application is designed to support the care of newborns and children with 
+                <strong>congenital heart disease (CHD)</strong> and <strong>rheumatic heart disease (RHD)</strong>.
+            </p>
+            
+            <div class="callout">
+                <p><strong>The Challenge:</strong> Newborns and children in Tanzania with congenital and rheumatic heart disease 
+                are suffering and, in too many cases, dying without effective follow-up. We need an administrative database 
+                to record critical patient data and trigger decision support.</p>
+            </div>
+
+            <h3>Key Objectives</h3>
+            <ul>
+                <li><strong>Patient Safety Events:</strong> Report and alert the Quality & Safety Team for investigation</li>
+                <li><strong>Follow-up Tracking:</strong> Record which babies and children require ongoing care</li>
+                <li><strong>Performance Dashboards:</strong> Track key performance indicators to drive improvement</li>
+            </ul>
+        </section>
+
+        <!-- Data Model Diagram -->
+        <section class="card">
+            <h2>Entity Relationship Diagram</h2>
+            <p>This diagram shows the relationships between all Salesforce objects in the data model:</p>
+            
+            <div class="diagram-container">
+                <pre class="mermaid">
+erDiagram
+    Account ||--o{ Account : "Lookup (ParentId)"
+    Account ||--o{ Contact : "Lookup (AccountId)"
+    Family_Unit__c ||--o{ Contact : "Lookup (Family_Unit__c)"
+    Contact ||--o{ Patient_Encounter__c : "Master-Detail (Patient__c)"
+    Contact ||--o{ Quality_Safety_Event__c : "Lookup (Patient__c)"
+    Contact ||--|| Maternal_Obstetric_Info__c : "Master-Detail (Contact__c)"
+    Patient_Encounter__c ||--o{ Clinical_Data__c : "Master-Detail (Patient_Encounter__c)"
+    Patient_Encounter__c ||--o{ Quality_Safety_Event__c : "Lookup (Patient_Encounter__c)"
+    
+    Account {
+        Id Id PK
+        string Name
+        Id ParentId FK
+        picklist Type
+        string Region
+    }
+    
+    Family_Unit__c {
+        Id Id PK
+        string Family_Name__c
+        text Residence_Address__c
+        string Village__c
+        string District__c
+        string Phone__c
+        text Notes__c
+    }
+    
+    Contact {
+        Id Id PK
+        Id AccountId FK
+        Id Family_Unit__c FK
+        string Name
+        date Birthdate
+        picklist RecordType
+        picklist Family_Role__c
+        string Medical_Record_Number__c
+        picklist Diagnosis_Category__c
+    }
+    
+    Maternal_Obstetric_Info__c {
+        Id Id PK
+        Id Contact__c FK
+        Id Child_Contact__c FK
+        date Delivery_Date__c
+        number Gestational_Age__c
+        number Birth_Weight__c
+    }
+    
+    Patient_Encounter__c {
+        Id Id PK
+        Id Patient__c FK
+        Id Referring_Facility__c FK
+        datetime Encounter_Date__c
+        picklist Encounter_Type__c
+        picklist Status__c
+    }
+    
+    Clinical_Data__c {
+        Id Id PK
+        Id Patient_Encounter__c FK
+        boolean CHD_Screening_Performed__c
+        boolean CHD_Screening_Failed__c
+        datetime Echo_Performed_DateTime__c
+        picklist Echo_Diagnosis__c
+        boolean RHD_Prophylaxis_Compliant__c
+    }
+    
+    Quality_Safety_Event__c {
+        Id Id PK
+        Id Patient__c FK
+        Id Patient_Encounter__c FK
+        datetime Event_DateTime__c
+        picklist Severity__c
+        picklist Status__c
+        Id Assigned_To__c FK
+    }
+                </pre>
+            </div>
+
+            <h3>Relationship Legend</h3>
+            <div class="grid-2" style="margin-top: 1rem;">
+                <div class="grid-item" style="border-left-color: #c53030;">
+                    <h4>Master-Detail</h4>
+                    <p>Child record cannot exist without parent. Deleting parent deletes children. Supports roll-up summary fields. Tighter coupling for dependent data.</p>
+                </div>
+                <div class="grid-item" style="border-left-color: #38a169;">
+                    <h4>Lookup</h4>
+                    <p>Loosely coupled relationship. Child can exist independently. Parent deletion does not cascade. More flexible for optional associations.</p>
+                </div>
+            </div>
+
+            <h3>Relationship Details</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parent Object</th>
+                        <th>Child Object</th>
+                        <th>Type</th>
+                        <th>Field Name</th>
+                        <th>Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Account</td>
+                        <td>Account</td>
+                        <td><span class="badge badge-custom" style="background: #e6ffed;">Lookup</span></td>
+                        <td>ParentId</td>
+                        <td>Standard hierarchy field; facilities can exist independently</td>
+                    </tr>
+                    <tr>
+                        <td>Account</td>
+                        <td>Contact</td>
+                        <td><span class="badge badge-custom" style="background: #e6ffed;">Lookup</span></td>
+                        <td>AccountId</td>
+                        <td>Standard field; patients may transfer between facilities</td>
+                    </tr>
+                    <tr>
+                        <td>Family_Unit__c</td>
+                        <td>Contact</td>
+                        <td><span class="badge badge-custom" style="background: #e6ffed;">Lookup</span></td>
+                        <td>Family_Unit__c</td>
+                        <td>Groups family members (patient, parents, siblings) under one household; members can exist independently</td>
+                    </tr>
+                    <tr>
+                        <td>Contact</td>
+                        <td>Patient_Encounter__c</td>
+                        <td><span class="badge badge-external" style="background: #fed7d7;">Master-Detail</span></td>
+                        <td>Patient__c</td>
+                        <td>Encounters belong to patient; enables roll-up counts; cascade delete</td>
+                    </tr>
+                    <tr>
+                        <td>Contact</td>
+                        <td>Maternal_Obstetric_Info__c</td>
+                        <td><span class="badge badge-external" style="background: #fed7d7;">Master-Detail</span></td>
+                        <td>Contact__c</td>
+                        <td>Obstetric info tied to mother; no orphan records; inherits sharing</td>
+                    </tr>
+                    <tr>
+                        <td>Contact</td>
+                        <td>Quality_Safety_Event__c</td>
+                        <td><span class="badge badge-custom" style="background: #e6ffed;">Lookup</span></td>
+                        <td>Patient__c</td>
+                        <td>Events may need to persist for audit even if patient record changes</td>
+                    </tr>
+                    <tr>
+                        <td>Patient_Encounter__c</td>
+                        <td>Clinical_Data__c</td>
+                        <td><span class="badge badge-external" style="background: #fed7d7;">Master-Detail</span></td>
+                        <td>Patient_Encounter__c</td>
+                        <td>Clinical data belongs to encounter; enables roll-ups for KPIs</td>
+                    </tr>
+                    <tr>
+                        <td>Patient_Encounter__c</td>
+                        <td>Quality_Safety_Event__c</td>
+                        <td><span class="badge badge-custom" style="background: #e6ffed;">Lookup</span></td>
+                        <td>Patient_Encounter__c</td>
+                        <td>Optional link; events may occur outside specific encounters</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Object Descriptions -->
+        <section class="card">
+            <h2>Object Descriptions</h2>
+            
+            <h3>Standard Objects</h3>
+            <p><span class="badge badge-standard">Standard</span> Leveraging Salesforce's built-in objects for core functionality</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Account</td>
+                        <td>Represents healthcare facilities in the referral network. KCMC is the parent account, with 20+ district hospitals and rural clinics as child accounts in a hierarchy.</td>
+                    </tr>
+                    <tr>
+                        <td>Contact</td>
+                        <td>Represents patients and their family members. Uses Record Types to distinguish between Patient, Parent, and Sibling. The <code>Family_Role__c</code> picklist identifies each person's role (Patient, Mother, Father, Sibling). Family members are grouped via lookup to Family_Unit__c.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Custom Objects - Phase 1</h3>
+            <p><span class="badge badge-custom">Custom</span> <span class="badge badge-phase1">Phase 1</span> Core application objects (0-6 months)</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Family_Unit__c</td>
+                        <td>Represents a family household. Groups patients with their parents and siblings under a single record. Stores shared family information like residence address, village, district, and contact phone number.</td>
+                    </tr>
+                    <tr>
+                        <td>Maternal_Obstetric_Info__c</td>
+                        <td>Stores maternal obstetric summary information for newborn patients. Links mother Contact to child Contact with pregnancy and delivery details.</td>
+                    </tr>
+                    <tr>
+                        <td>Patient_Encounter__c</td>
+                        <td>Tracks unique patient visits/encounters at KCMC. This is the central object that links all clinical activities for a patient visit (screenings, echos, follow-ups, surgeries).</td>
+                    </tr>
+                    <tr>
+                        <td>Clinical_Data__c</td>
+                        <td>Stores clinical findings per encounter including CHD screening results, echocardiogram findings, diagnoses, and RHD prophylaxis compliance tracking.</td>
+                    </tr>
+                    <tr>
+                        <td>Quality_Safety_Event__c</td>
+                        <td>Records patient safety events for Q/S team investigation. Supports the full investigation workflow from initial report through resolution.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>External Objects - Phase 2</h3>
+            <p><span class="badge badge-external">External</span> <span class="badge badge-phase2">Phase 2</span> System integrations (6+ months)</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Source System</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EHR_External__x</td>
+                        <td>eHMS (GPITG)</td>
+                        <td>Pulls patient demographics, medical record numbers, and newborn counts within time periods for KPI calculations.</td>
+                    </tr>
+                    <tr>
+                        <td>Echo_Imaging_External__x</td>
+                        <td>Showcase (Trillium)</td>
+                        <td>Receives key cardiac imaging findings from the echocardiography reading system for clinical decision support.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Design Rationale -->
+        <section class="card">
+            <h2>Design Rationale</h2>
+            <p>The following design decisions were made to optimize for the project's unique requirements:</p>
+
+            <div class="grid-2">
+                <div class="grid-item">
+                    <h4>Standard Objects First</h4>
+                    <p>Used Account and Contact as the foundation to leverage Salesforce's built-in features (sharing, reporting, mobile) and reduce development time.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Account Hierarchy for Referrals</h4>
+                    <p>The parent-child Account structure naturally models KCMC's referral network from 20+ district hospitals and rural clinics without custom development.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Contact Record Types</h4>
+                    <p>Using Record Types (Patient/Parent/Sibling) on Contact allows family members to be stored in one object while maintaining different page layouts and validation rules.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Family Unit Object</h4>
+                    <p>A dedicated <code>Family_Unit__c</code> object represents each household. All family members (patient, parents, siblings) link to the same record, enabling clear grouping and shared residence/contact info.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Encounter-Centric Clinical Data</h4>
+                    <p>Separating Patient_Encounter__c from Clinical_Data__c allows multiple clinical assessments per visit and supports the unique patient encounter requirement.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Maternal Info as Separate Object</h4>
+                    <p>Obstetric information is stored separately to maintain data integrity and allow linking between mother (Contact) and child (Contact) records.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>External Objects for Integration</h4>
+                    <p>Using Salesforce Connect with external objects enables real-time data from eHMS and Showcase without ETL complexity or data duplication concerns.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Mobile-First Considerations</h4>
+                    <p>All custom objects are designed with minimal required fields to support mobile data entry by staff in the field or even patients.</p>
+                </div>
+            </div>
+
+            <div class="callout callout-success">
+                <p><strong>Sustainability Focus:</strong> This design prioritizes simplicity and uses declarative Salesforce features 
+                wherever possible. This supports skill-building for local staff and reduces dependency on specialized developers, 
+                aligning with the goal of building sustainable capacity in this low/middle income setting.</p>
+            </div>
+        </section>
+
+        <!-- KPI & Automation -->
+        <section class="card">
+            <h2>Dashboards & Automation</h2>
+            
+            <h3>Key Performance Indicators</h3>
+            <p>The data model supports tracking these critical KPIs:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th>Calculation</th>
+                        <th>Source Fields</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>% Newborns Screened</td>
+                        <td>Newborns with CHD screening / Total newborns</td>
+                        <td><code>CHD_Screening_Performed__c</code> + EHR newborn count</td>
+                    </tr>
+                    <tr>
+                        <td>% Echo within 12 hours</td>
+                        <td>Failed screenings with echo ≤12hrs / Total failed screenings</td>
+                        <td><code>Echo_Performed_DateTime__c</code> - screening time</td>
+                    </tr>
+                    <tr>
+                        <td>% RHD Prophylaxis Compliance</td>
+                        <td>Compliant RHD patients / Total RHD patients requiring prophylaxis</td>
+                        <td><code>RHD_Prophylaxis_Compliant__c</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Automated Notifications</h3>
+            <p>Flow or Process Builder automations will trigger alerts for these events:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trigger Condition</th>
+                        <th>Notification Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>New <code>Quality_Safety_Event__c</code> created</td>
+                        <td>Quality & Safety Team</td>
+                    </tr>
+                    <tr>
+                        <td><code>Echo_Diagnosis__c</code> = "Critical CHD"</td>
+                        <td>Patient Operations Team</td>
+                    </tr>
+                    <tr>
+                        <td><code>Echo_Diagnosis__c</code> = "Significant RHD"</td>
+                        <td>Patient Operations Team</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <p><strong>Implementation Note:</strong> These automations should be built using Salesforce Flow (not Apex) 
+                to maintain the low-code approach and enable local staff to modify notification logic as needed.</p>
+            </div>
+        </section>
+
+        <!-- Implementation Phases -->
+        <section class="card">
+            <h2>Implementation Roadmap</h2>
+            
+            <h3>Phase 1: Core Application</h3>
+            <ul>
+                <li>Configure Account hierarchy (KCMC + district hospitals + rural clinics)</li>
+                <li>Set up Contact with Record Types and family linking</li>
+                <li>Create all Phase 1 custom objects with fields and relationships</li>
+                <li>Build page layouts optimized for mobile input</li>
+                <li>Create notification flows for Q/S events and critical diagnoses</li>
+                <li>Build KPI dashboard with available data</li>
+            </ul>
+
+            <h3>Phase 2: System Integration</h3>
+            <ul>
+                <li>Configure Salesforce Connect for external data sources</li>
+                <li>Set up EHR external object (eHMS integration)</li>
+                <li>Set up Echo Imaging external object (Showcase integration)</li>
+                <li>Enhance KPI dashboard with integrated newborn counts</li>
+                <li>Implement automated record matching between systems</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>KCMC Cardiac Centre Salesforce Data Model | Foundation for Cardiovascular Care in Africa</p>
+        <p>Document generated for project planning purposes</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#e6f0fa',
+                primaryTextColor: '#2d3748',
+                primaryBorderColor: '#0066cc',
+                lineColor: '#718096',
+                secondaryColor: '#f0fff4',
+                tertiaryColor: '#fef3e6',
+                fontFamily: 'Inter, sans-serif'
+            },
+            er: {
+                diagramPadding: 20,
+                layoutDirection: 'TB',
+                minEntityWidth: 100,
+                minEntityHeight: 75,
+                entityPadding: 15,
+                useMaxWidth: true
+            }
+        });
+    </script>
+</body>
+</html>
