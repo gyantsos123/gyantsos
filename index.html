@@ -1234,11 +1234,11 @@
                 }
             },
             "interactivity": {
-                "detect_on": "canvas",
+                "detect_on": "window",
                 "events": {
                     "onhover": {
-                        "enable": !isMobile,
-                        "mode": "grab"
+                        "enable": true,
+                        "mode": ["grab", "bubble"]
                     },
                     "onclick": {
                         "enable": true,
@@ -1248,10 +1248,21 @@
                 },
                 "modes": {
                     "grab": {
-                        "distance": 140,
+                        "distance": 200,
                         "line_linked": {
-                            "opacity": 0.8
+                            "opacity": 1
                         }
+                    },
+                    "bubble": {
+                        "distance": 200,
+                        "size": 8,
+                        "duration": 0.3,
+                        "opacity": 1,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 150,
+                        "duration": 0.4
                     },
                     "push": {
                         "particles_nb": isMobile ? 2 : 4
