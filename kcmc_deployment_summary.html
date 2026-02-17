@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCMC Cardiac Centre - Deployment Summary</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0066CC;
+            border-bottom: 3px solid #0066CC;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #0066CC;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .header-info {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-left: 4px solid #0066CC;
+            margin-bottom: 25px;
+        }
+        .status-badge {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        ul {
+            margin-left: 20px;
+            padding-left: 0;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        strong {
+            color: #0066CC;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h1>KCMC Cardiac Centre - Salesforce Application Deployment Summary</h1>
+        
+        <div class="header-info">
+            <p><strong>Date:</strong> February 20, 2026</p>
+            <p><strong>Deployed To:</strong> KCMC Sandbox Org (gyantsos@salesforce.com.kcmc)</p>
+            <p><strong>Status:</strong> <span class="status-badge">✅ Successfully Deployed</span></p>
+        </div>
+
+        <div class="section">
+            <h2>Overview</h2>
+            <p>Created and deployed a complete Salesforce application for the KCMC Cardiac Centre to support pediatric cardiac care management for newborns and children with congenital heart disease (CHD) and rheumatic heart disease (RHD) at Kilimanjaro Christian Medical Center in Tanzania.</p>
+        </div>
+
+        <div class="section">
+            <h2>Custom Objects Created</h2>
+            
+            <h3>1. Family_Unit__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object to represent family households</li>
+                <li><strong>Added</strong> fields: Family Name, Residence Address, Village, District, Phone, Notes</li>
+                <li><strong>Configured</strong> for grouping patients with their parents and siblings</li>
+            </ul>
+
+            <h3>2. Patient_Encounter__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object to track unique patient visits at KCMC</li>
+                <li><strong>Established</strong> Master-Detail relationship to Contact (Patient)</li>
+                <li><strong>Added</strong> fields: Patient, Referring Facility, Encounter Date, Encounter Type, Status, Notes</li>
+                <li><strong>Configured</strong> as central object linking all clinical activities</li>
+            </ul>
+
+            <h3>3. Clinical_Data__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object to store clinical findings per encounter</li>
+                <li><strong>Established</strong> Master-Detail relationship to Patient_Encounter__c</li>
+                <li><strong>Added</strong> CHD screening fields: Performed, Failed, DateTime</li>
+                <li><strong>Added</strong> Echo fields: Performed DateTime, Diagnosis (with Critical CHD/Significant RHD values)</li>
+                <li><strong>Added</strong> RHD Prophylaxis fields: Compliant, Due Date</li>
+                <li><strong>Created</strong> formula field <code>Hours_to_Echo__c</code> to calculate time from screening failure to echo (supports KPI tracking)</li>
+                <li><strong>Added</strong> Clinical Notes field</li>
+            </ul>
+
+            <h3>4. Maternal_Obstetric_Info__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object for maternal obstetric information</li>
+                <li><strong>Established</strong> Master-Detail relationship to Contact (Mother)</li>
+                <li><strong>Added</strong> Lookup relationship to Contact (Child)</li>
+                <li><strong>Added</strong> fields: Delivery Date, Gestational Age, Birth Weight, Delivery Type, Pregnancy Complications, Prenatal CHD Detected</li>
+                <li><strong>Configured</strong> lookup filter on Mother__c field to restrict selection to Contacts with Family_Role__c = "Mother"</li>
+            </ul>
+
+            <h3>5. Quality_Safety_Event__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object for patient safety event tracking</li>
+                <li><strong>Added</strong> fields: Patient, Patient Encounter, Event DateTime, Event Type, Severity, Status, Assigned To, Description, Root Cause, Corrective Actions, Resolution Date</li>
+                <li><strong>Configured</strong> to support full investigation workflow</li>
+            </ul>
+
+            <h3>6. EHR_Helper__c</h3>
+            <ul>
+                <li><strong>Created</strong> custom object for manual denominator data tracking</li>
+                <li><strong>Added</strong> fields: Month, Year, Newborn Count, Facility (Lookup to Account)</li>
+                <li><strong>Designed</strong> to support KPI calculations until EHR integration is available</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Standard Object Customizations</h2>
+            
+            <h3>Contact Object</h3>
+            <ul>
+                <li><strong>Added</strong> 7 custom fields:
+                    <ul>
+                        <li>Family_Unit__c (Lookup to Family Unit)</li>
+                        <li>Family_Role__c (Picklist: Patient, Mother, Father, Sibling, Guardian, Other)</li>
+                        <li>Medical_Record_Number__c (Text, External ID, Unique)</li>
+                        <li>National_MRN__c (Text, External ID, Unique - placeholder for future national MRN)</li>
+                        <li>Diagnosis_Category__c (Picklist: CHD, RHD, Both, etc.)</li>
+                        <li>Patient_Status__c (Picklist: Active, Discharged, Lost to Follow-up, etc.)</li>
+                        <li>Next_Follow_Up_Date__c (Date)</li>
+                    </ul>
+                </li>
+                <li><strong>Created</strong> 3 Record Types: Patient, Parent, Sibling</li>
+            </ul>
+
+            <h3>Account Object</h3>
+            <ul>
+                <li><strong>Added</strong> 2 custom fields:
+                    <ul>
+                        <li>Region__c (Picklist - Tanzanian regions)</li>
+                        <li>Facility_Type__c (Picklist - Tertiary Hospital, District Hospital, Health Center, etc.)</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Application & User Interface</h2>
+            
+            <h3>Lightning Application</h3>
+            <ul>
+                <li><strong>Created</strong> "KCMC Cardiac Centre" Lightning application</li>
+                <li><strong>Configured</strong> with all custom tabs and standard objects</li>
+                <li><strong>Added</strong> app visibility to permission sets</li>
+            </ul>
+
+            <h3>Custom Tabs</h3>
+            <ul>
+                <li><strong>Created</strong> 6 custom tabs: Family Unit, Patient Encounter, Clinical Data, Maternal Obstetric Info, Quality Safety Event, EHR Helper</li>
+            </ul>
+
+            <h3>Page Layouts</h3>
+            <ul>
+                <li><strong>Created</strong> 5 page layouts (one for each custom object)</li>
+                <li><strong>Optimized</strong> layouts for mobile data entry</li>
+                <li><strong>Configured</strong> related lists and field organization</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Security & Permissions</h2>
+            
+            <h3>Permission Sets Created</h3>
+            <ul>
+                <li><strong>Created</strong> KCMC_Cardiac_User permission set
+                    <ul>
+                        <li>Read/Edit access to all custom objects</li>
+                        <li>View All Records enabled for Contact, Maternal_Obstetric_Info__c, Quality_Safety_Event__c</li>
+                        <li>Field-level permissions configured</li>
+                        <li>Tab visibility configured</li>
+                    </ul>
+                </li>
+                <li><strong>Created</strong> KCMC_Cardiac_Admin permission set
+                    <ul>
+                        <li>Full CRUD + Modify All Records on all custom objects</li>
+                        <li>Delete permissions for administrators</li>
+                        <li>All field permissions enabled</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Permission Set Updates</h3>
+            <ul>
+                <li><strong>Updated</strong> permission sets to enable View All Records for improved visibility</li>
+                <li><strong>Added</strong> Contact and Account object permissions (required for Master-Detail relationships)</li>
+                <li><strong>Added</strong> app visibility to both permission sets</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Automation & Notifications</h2>
+            
+            <h3>Flows Created</h3>
+            <ul>
+                <li><strong>Created</strong> Quality_Safety_Event_Notification flow
+                    <ul>
+                        <li>Triggers when Quality_Safety_Event__c record is created</li>
+                        <li>Sends email notification to gyantsos@salesforce.com</li>
+                        <li>Includes event details and link to record</li>
+                    </ul>
+                </li>
+                <li><strong>Created</strong> Critical_Diagnosis_Alert flow
+                    <ul>
+                        <li>Triggers when Clinical_Data__c is created or updated</li>
+                        <li>Checks if Echo_Diagnosis__c = "Critical CHD" OR "Significant RHD"</li>
+                        <li>Sends urgent email alerts to gyantsos@salesforce.com</li>
+                        <li>Includes clinical details and action requirements</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Custom Notification Type</h3>
+            <ul>
+                <li><strong>Created</strong> Quality_Safety_Event_Notification custom notification type</li>
+                <li><strong>Enabled</strong> for Desktop and Mobile platforms</li>
+                <li><strong>Deployed</strong> and ready for use in flows</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Model Configuration</h2>
+            
+            <h3>Relationships Established</h3>
+            <ul>
+                <li><strong>Configured</strong> Account hierarchy (ParentId) for facility network</li>
+                <li><strong>Established</strong> Contact → Family_Unit__c lookup relationship</li>
+                <li><strong>Established</strong> Contact → Patient_Encounter__c Master-Detail relationship</li>
+                <li><strong>Established</strong> Patient_Encounter__c → Clinical_Data__c Master-Detail relationship</li>
+                <li><strong>Established</strong> Patient_Encounter__c → Quality_Safety_Event__c lookup relationship</li>
+                <li><strong>Established</strong> Contact (Mother) → Maternal_Obstetric_Info__c Master-Detail relationship</li>
+                <li><strong>Established</strong> Maternal_Obstetric_Info__c → Contact (Child) lookup relationship</li>
+                <li><strong>Established</strong> Account → EHR_Helper__c lookup relationship</li>
+            </ul>
+
+            <h3>Field Configurations</h3>
+            <ul>
+                <li><strong>Configured</strong> lookup filter on Maternal_Obstetric_Info__c.Mother__c to restrict to mothers only</li>
+                <li><strong>Created</strong> formula field Hours_to_Echo__c for automatic KPI calculation</li>
+                <li><strong>Set</strong> Medical_Record_Number__c and National_MRN__c as External IDs for integration readiness</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Deployment Details</h2>
+            
+            <h3>Components Deployed</h3>
+            <ul>
+                <li><strong>Deployed</strong> 79 metadata components to KCMC org</li>
+                <li><strong>Created</strong> 6 custom objects with 50+ custom fields</li>
+                <li><strong>Created</strong> 6 custom tabs</li>
+                <li><strong>Created</strong> 5 page layouts</li>
+                <li><strong>Created</strong> 2 permission sets</li>
+                <li><strong>Created</strong> 2 active flows</li>
+                <li><strong>Created</strong> 1 Lightning application</li>
+                <li><strong>Created</strong> 1 custom notification type</li>
+                <li><strong>Created</strong> 3 Contact record types</li>
+            </ul>
+
+            <h3>Deployment Status</h3>
+            <ul>
+                <li>✅ All components successfully deployed</li>
+                <li>✅ Application active and ready for use</li>
+                <li>✅ Permission sets assigned to users</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Key Features Delivered</h2>
+            <ul>
+                <li>✅ <strong>KPI Support:</strong> Formula field calculates hours from CHD screening failure to echo</li>
+                <li>✅ <strong>Family Management:</strong> Family_Unit__c groups patients with parents and siblings</li>
+                <li>✅ <strong>Encounter Tracking:</strong> Patient_Encounter__c centralizes all clinical activities</li>
+                <li>✅ <strong>Safety Event Management:</strong> Quality_Safety_Event__c supports investigation workflow</li>
+                <li>✅ <strong>EHR Readiness:</strong> EHR_Helper__c enables manual denominator tracking</li>
+                <li>✅ <strong>Automated Notifications:</strong> Email alerts for safety events and critical diagnoses</li>
+                <li>✅ <strong>Mobile-Optimized:</strong> Layouts designed for field data entry</li>
+                <li>✅ <strong>Contacts Tab Renamed:</strong> Renamed tab label from "Contacts" to "Patients"</li>
+                <li>✅ <strong>Default Landing Page:</strong> Auto launch KCMC app on login</li>
+                <li>✅ <strong>Branding:</strong> Minor branding changes to support the KCMC brand</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Next Steps & Recommendations</h2>
+            <ol>
+                <li><strong>Walkthrough with Phil:</strong> Train staff on using the KCMC Cardiac Centre application</li>
+                <li><strong>Modifications as needed:</strong> Adjustments the new structure</li>
+                <li><strong>Report Creation:</strong> Build reports and dashboards for KPI tracking</li>
+                <li><strong>EHR Integration:</strong> Plan Phase 2 integration with eHMS and Showcase systems</li>
+                <li><strong>Workflow Refinement:</strong> Adjust flows and automation based on user feedback</li>
+            </ol>
+        </div>
+
+        <div class="highlight">
+            <h3>Notes</h3>
+            <ul>
+                <li>Owner notification flow was created manually in Flow Builder UI (not included in metadata deployment)</li>
+                <li>Permission sets were updated during deployment to resolve visibility issues</li>
+                <li>All custom objects are configured with appropriate sharing models and field-level security</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><strong>Prepared by:</strong> Gary Yantsos</p>
+            <p><strong>For:</strong> KCMC Cardiac Centre Project</p>
+            <p><strong>Foundation for Cardiovascular Care in Africa (FCCA)</strong></p>
+        </div>
+    </div>
+</body>
+</html>
