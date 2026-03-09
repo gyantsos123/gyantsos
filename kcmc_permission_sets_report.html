@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCMC Cardiac Centre - Permission Sets Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --surface-alt: #f8fbff;
+            --text: #1d2733;
+            --muted: #596777;
+            --brand: #0c4a8a;
+            --brand-soft: #e9f1fb;
+            --border: #d7e0ea;
+            --success-bg: #e9f8ef;
+            --success-border: #2e8b57;
+            --warning-bg: #fff6e5;
+            --warning-border: #c47f00;
+            --danger-bg: #fff0f0;
+            --danger-border: #cc3333;
+            --shadow: 0 8px 22px rgba(17, 43, 72, 0.08);
+            --radius: 10px;
+
+            --admin-accent: #7b2d8b;
+            --admin-soft: #f5eef8;
+            --admin-border: #d3a8e0;
+            --user-accent: #0c6e4a;
+            --user-soft: #eaf7f1;
+            --user-border: #8ecfb4;
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: 'Source Sans 3', 'Segoe UI', Tahoma, sans-serif;
+            background: radial-gradient(circle at top right, #ebf3ff 0%, var(--bg) 45%, #edf2f8 100%);
+            color: var(--text);
+            line-height: 1.65;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 28px auto 56px;
+            padding: 0 20px;
+        }
+
+        .doc-shell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        header {
+            background: linear-gradient(120deg, #0f3f74 0%, #0c4a8a 52%, #2f6ba6 100%);
+            color: #fff;
+            padding: 28px 34px;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+            font-weight: 700;
+            opacity: 0.9;
+            margin: 0 0 6px;
+        }
+
+        h1 {
+            font-family: 'Merriweather', Georgia, serif;
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.25;
+        }
+
+        .subtitle {
+            margin: 10px 0 0;
+            max-width: 80ch;
+            opacity: 0.96;
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .meta-item strong {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.85;
+        }
+
+        .meta-item span {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* ── Layout ── */
+        main {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+
+        nav {
+            border-right: 1px solid var(--border);
+            background: var(--surface-alt);
+            padding: 26px 18px;
+            position: sticky;
+            top: 0;
+            align-self: start;
+            max-height: 100vh;
+            overflow: auto;
+        }
+
+        nav h3 {
+            margin: 0 0 6px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        nav ul {
+            margin: 0 0 18px;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav li { margin: 4px 0; }
+
+        nav a {
+            text-decoration: none;
+            color: #1f3d5c;
+            padding: 6px 8px;
+            display: block;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        nav a:hover, nav a:focus {
+            background: var(--brand-soft);
+            color: var(--brand);
+            outline: none;
+        }
+
+        nav a.sub {
+            font-weight: 400;
+            font-size: 0.87rem;
+            padding-left: 16px;
+            color: var(--muted);
+        }
+
+        nav a.sub:hover { color: var(--brand); }
+
+        .content {
+            padding: 28px 36px 40px;
+            min-width: 0;
+        }
+
+        /* ── Typography ── */
+        h2 {
+            color: var(--brand);
+            margin: 32px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+            font-size: 1.5rem;
+            scroll-margin-top: 16px;
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        h3 {
+            color: #243f5c;
+            margin: 22px 0 8px;
+            font-size: 1.12rem;
+            scroll-margin-top: 16px;
+        }
+
+        h4 {
+            margin: 16px 0 6px;
+            color: #2b4c70;
+            font-size: 0.98rem;
+            font-weight: 700;
+        }
+
+        p { margin: 8px 0; }
+
+        /* ── Permission Set Cards ── */
+        .ps-card {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin: 0 0 36px;
+        }
+
+        .ps-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 18px 22px;
+        }
+
+        .ps-card-header.admin {
+            background: linear-gradient(120deg, #4a0e5e 0%, #7b2d8b 100%);
+            color: #fff;
+        }
+
+        .ps-card-header.user {
+            background: linear-gradient(120deg, #0a4a30 0%, #0c6e4a 100%);
+            color: #fff;
+        }
+
+        .ps-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .ps-card-header h3 {
+            margin: 0 0 4px;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .ps-card-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.93rem;
+        }
+
+        .ps-api-name {
+            font-size: 0.78rem;
+            font-family: monospace;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 4px;
+            padding: 1px 7px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+
+        .ps-card-body {
+            padding: 22px;
+            background: var(--surface);
+        }
+
+        /* ── Summary Badges ── */
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 22px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .badge-green  { background: #e6f7ee; color: #1b6e3c; border-color: #a8d9b8; }
+        .badge-purple { background: #f3eaf8; color: #6a1b7d; border-color: #c9a0d9; }
+        .badge-blue   { background: #e7f0fc; color: #1145a0; border-color: #9ab8e8; }
+        .badge-orange { background: var(--warning-bg); color: #8a5400; border-color: #f0ce84; }
+        .badge-red    { background: var(--danger-bg); color: #8c1c1c; border-color: #e8a0a0; }
+        .badge-gray   { background: #f0f2f4; color: #4a5568; border-color: #c8d0db; }
+
+        /* ── Tables ── */
+        .table-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            font-size: 0.91rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 9px 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #0f4f91;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        tr:nth-child(even) { background: #f7fafc; }
+        tr:hover { background: #eef4fb; }
+
+        .obj-name {
+            font-family: monospace;
+            font-size: 0.88em;
+            color: #1a3a5c;
+            font-weight: 600;
+        }
+
+        /* ── Permission Icons ── */
+        .perm-yes {
+            color: #1b7c3e;
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+
+        .perm-no {
+            color: #b0b8c4;
+            font-size: 1.1em;
+        }
+
+        .perm-ro {
+            color: #c47f00;
+            font-weight: 600;
+            font-size: 0.82em;
+        }
+
+        /* ── Field Permission Group ── */
+        .field-group {
+            margin: 0 0 24px;
+        }
+
+        .field-group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 700;
+            font-size: 0.88rem;
+            border: 1px solid var(--border);
+            background: #e8eef5;
+            color: #1a3a5c;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .field-group-header .obj-badge {
+            font-family: monospace;
+            font-size: 0.85em;
+            background: #0f4f91;
+            color: #fff;
+            padding: 1px 8px;
+            border-radius: 4px;
+        }
+
+        .field-group-header .count-badge {
+            margin-left: auto;
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .field-table-wrap {
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .field-table-wrap table {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
+        /* ── Callout boxes ── */
+        .callout {
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin: 14px 0;
+            border: 1px solid transparent;
+            font-size: 0.93rem;
+        }
+
+        .callout-info {
+            background: var(--brand-soft);
+            border-color: #a8c4e8;
+            border-left: 4px solid var(--brand);
+        }
+
+        .callout-warn {
+            background: var(--warning-bg);
+            border-color: #f0ce84;
+            border-left: 4px solid var(--warning-border);
+        }
+
+        .callout-success {
+            background: var(--success-bg);
+            border-color: #a8d9be;
+            border-left: 4px solid var(--success-border);
+        }
+
+        .callout strong { display: block; margin-bottom: 3px; }
+
+        /* ── Comparison Table ── */
+        .compare-section {
+            margin: 0 0 36px;
+        }
+
+        /* ── Tabs ── */
+        .tab-strip {
+            display: flex;
+            gap: 6px;
+            border-bottom: 2px solid var(--border);
+            margin: 0 0 18px;
+        }
+
+        .tab-btn {
+            padding: 8px 18px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #f0f4f8;
+            color: var(--muted);
+            margin-bottom: -2px;
+            transition: all 0.15s;
+        }
+
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--brand);
+            border-color: var(--border);
+            border-bottom-color: var(--surface);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--surface-alt);
+            padding: 16px 34px;
+            font-size: 0.87rem;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        code {
+            background: #edf2f8;
+            border: 1px solid #d8e2ee;
+            border-radius: 5px;
+            padding: 1px 6px;
+            font-size: 0.9em;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 780px) {
+            main { grid-template-columns: 1fr; }
+            nav { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+  <div class="doc-shell">
+
+    <!-- ── Header ── -->
+    <header>
+      <p class="eyebrow">Kilimanjaro Christian Medical Centre · Salesforce Security</p>
+      <h1>Permission Sets Report</h1>
+      <p class="subtitle">Detailed breakdown of Salesforce permission sets deployed for the KCMC Cardiac Centre application — covering object permissions, field-level security, tab visibility, and app access.</p>
+      <div class="meta">
+        <div class="meta-item"><strong>Application</strong><span>KCMC Cardiac Centre</span></div>
+        <div class="meta-item"><strong>Permission Sets</strong><span>2 Deployed</span></div>
+        <div class="meta-item"><strong>Objects Covered</strong><span>9 Objects</span></div>
+        <div class="meta-item"><strong>Report Date</strong><span>March 9, 2026</span></div>
+        <div class="meta-item"><strong>Org</strong><span>gyantsos@salesforce.com.kcmc</span></div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ── Sidebar Nav ── -->
+      <nav>
+        <h3>On This Page</h3>
+        <ul>
+          <li><a href="#overview">Overview &amp; Comparison</a></li>
+          <li><a href="#admin">KCMC Cardiac Admin</a></li>
+          <li><a href="#admin-objects" class="sub">Object Permissions</a></li>
+          <li><a href="#admin-fields" class="sub">Field Permissions</a></li>
+          <li><a href="#admin-tabs" class="sub">Tabs &amp; App Access</a></li>
+          <li><a href="#user">KCMC Cardiac User</a></li>
+          <li><a href="#user-objects" class="sub">Object Permissions</a></li>
+          <li><a href="#user-fields" class="sub">Field Permissions</a></li>
+          <li><a href="#user-tabs" class="sub">Tabs &amp; App Access</a></li>
+        </ul>
+        <h3>Legend</h3>
+        <ul>
+          <li style="font-size:0.85rem;padding:4px 8px;color:var(--muted)"><span class="perm-yes">✔</span> Granted</li>
+          <li style="font-size:0.85rem;padding:4px 8px;color:var(--muted)"><span class="perm-no">—</span> Not Granted</li>
+          <li style="font-size:0.85rem;padding:4px 8px;color:var(--muted)"><span class="perm-ro">R/O</span> Read-Only</li>
+        </ul>
+      </nav>
+
+      <!-- ── Main Content ── -->
+      <div class="content">
+
+        <!-- ── Overview ── -->
+        <h2 id="overview">Overview &amp; Comparison</h2>
+        <p>Two permission sets govern access to the KCMC Cardiac Centre Salesforce application. They share the same field-level access but differ significantly in object-level CRUD privileges and record visibility.</p>
+
+        <div class="callout callout-info">
+          <strong>App Visibility</strong>
+          Both permission sets grant visibility to the <code>KCMC_Cardiac_Centre</code> Lightning application. Users must be assigned one of these permission sets to see the app in their app launcher.
+        </div>
+
+        <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th style="background:#4a0e5e;">KCMC Cardiac Admin</th>
+              <th style="background:#0a4a30;">KCMC Cardiac User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Create records on custom objects</td>
+              <td><span class="perm-yes">✔</span> All objects</td>
+              <td><span class="perm-yes">✔</span> All except Account</td>
+            </tr>
+            <tr>
+              <td>Edit records</td>
+              <td><span class="perm-yes">✔</span> All objects</td>
+              <td><span class="perm-yes">✔</span> All objects</td>
+            </tr>
+            <tr>
+              <td>Delete records</td>
+              <td><span class="perm-yes">✔</span> All custom objects</td>
+              <td><span class="perm-no">—</span> No delete</td>
+            </tr>
+            <tr>
+              <td>Modify All Records</td>
+              <td><span class="perm-yes">✔</span> All custom objects</td>
+              <td><span class="perm-no">—</span> Not granted</td>
+            </tr>
+            <tr>
+              <td>View All Records (Contact)</td>
+              <td><span class="perm-yes">✔</span></td>
+              <td><span class="perm-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td>View All Records (Account)</td>
+              <td><span class="perm-yes">✔</span></td>
+              <td><span class="perm-no">—</span></td>
+            </tr>
+            <tr>
+              <td>View All Records (Quality Safety Event)</td>
+              <td><span class="perm-yes">✔</span></td>
+              <td><span class="perm-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td>View All Records (Maternal Obstetric Info)</td>
+              <td><span class="perm-yes">✔</span></td>
+              <td><span class="perm-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td>View All Records (Heart Disease Follow Up)</td>
+              <td><span class="perm-yes">✔</span></td>
+              <td><span class="perm-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td>Field-level permissions (all fields)</td>
+              <td><span class="perm-yes">✔</span> Read + Edit</td>
+              <td><span class="perm-yes">✔</span> Read + Edit</td>
+            </tr>
+            <tr>
+              <td>Tab visibility (all custom tabs)</td>
+              <td><span class="perm-yes">✔</span> Visible</td>
+              <td><span class="perm-yes">✔</span> Visible</td>
+            </tr>
+            <tr>
+              <td>App visibility</td>
+              <td><span class="perm-yes">✔</span> KCMC Cardiac Centre</td>
+              <td><span class="perm-yes">✔</span> KCMC Cardiac Centre</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             KCMC CARDIAC ADMIN
+        ════════════════════════════════════════ -->
+        <h2 id="admin">KCMC Cardiac Admin</h2>
+
+        <div class="ps-card">
+          <div class="ps-card-header admin">
+            <div class="ps-icon">🛡</div>
+            <div>
+              <h3>KCMC Cardiac Admin</h3>
+              <p>Administrator permission set for KCMC Cardiac Centre. Grants full access to all custom objects including delete permissions and the ability to modify all records.</p>
+              <span class="ps-api-name">KCMC_Cardiac_Admin</span>
+            </div>
+          </div>
+          <div class="ps-card-body">
+            <div class="badge-row">
+              <span class="badge badge-purple">Full CRUD</span>
+              <span class="badge badge-purple">Modify All Records</span>
+              <span class="badge badge-purple">View All Records</span>
+              <span class="badge badge-blue">9 Objects</span>
+              <span class="badge badge-blue">6 Tabs Visible</span>
+              <span class="badge badge-green">App Access</span>
+            </div>
+
+            <!-- Admin Object Permissions -->
+            <h3 id="admin-objects">Object Permissions</h3>
+            <p>The Admin permission set grants full CRUD plus <strong>Modify All Records</strong> on all custom objects, giving administrators the ability to view, edit, and delete any record regardless of ownership.</p>
+
+            <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Object</th>
+                  <th>Type</th>
+                  <th>Create</th>
+                  <th>Read</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                  <th>View All</th>
+                  <th>Modify All</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="obj-name">Account</span></td>
+                  <td>Standard</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Contact</span></td>
+                  <td>Standard</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Family_Unit__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Patient_Encounter__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Clinical_Data__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">POX_Screening__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Heart_Disease_Follow_Up__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Maternal_Obstetric_Info__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Quality_Safety_Event__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+
+            <div class="callout callout-warn">
+              <strong>Note on Account &amp; Delete</strong>
+              Account delete is not enabled in this permission set. Account records represent healthcare facilities and are managed centrally. Contact, and all custom clinical objects, allow delete by Admin users.
+            </div>
+
+            <!-- Admin Field Permissions -->
+            <h3 id="admin-fields">Field-Level Permissions</h3>
+            <p>All fields are granted <strong>Read + Edit</strong> access, with the exception of formula fields which are inherently read-only in Salesforce.</p>
+
+            <!-- Account -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Account</span>
+                Standard Object — Facility Information
+                <span class="count-badge">2 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Account.Facility_Type__c</code></td><td>Facility Type</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Account.Region__c</code></td><td>Region</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Contact</span>
+                Standard Object — Patient / Family Member
+                <span class="count-badge">16 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Contact.Apgar_1_Minute__c</code></td><td>Apgar Score (1 min)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Apgar_5_Minute__c</code></td><td>Apgar Score (5 min)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Birth_Weight_kg__c</code></td><td>Birth Weight (kg)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Caretaker_Email__c</code></td><td>Caretaker Email</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Caretaker_Phone__c</code></td><td>Caretaker Phone</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Diagnosis_Category__c</code></td><td>Diagnosis Category</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Family_Role__c</code></td><td>Family Role</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Family_Unit__c</code></td><td>Family Unit</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Gender__c</code></td><td>Gender</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Gestational_Age_Weeks__c</code></td><td>Gestational Age (weeks)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Medical_Record_Number__c</code></td><td>Medical Record Number</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.MRN_Not_Yet_Assigned__c</code></td><td>MRN Not Yet Assigned</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.National_MRN__c</code></td><td>National MRN</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Next_Follow_Up_Date__c</code></td><td>Next Follow-Up Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_Account__c</code></td><td>Other Account</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_Account_MRN__c</code></td><td>Other Account MRN</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_SDOH_Details__c</code></td><td>Other SDOH Details</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Patient_Status__c</code></td><td>Patient Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Social_Determinants_of_Health__c</code></td><td>Social Determinants of Health</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Time_of_Birth__c</code></td><td>Time of Birth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Family Unit -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Family_Unit__c</span>
+                Custom Object — Household / Family Group
+                <span class="count-badge">5 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Family_Unit__c.District__c</code></td><td>District</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Notes__c</code></td><td>Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Phone__c</code></td><td>Phone</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Residence_Address__c</code></td><td>Residence Address</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Village__c</code></td><td>Village</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Patient Encounter -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Patient_Encounter__c</span>
+                Custom Object — Clinical Visit Record
+                <span class="count-badge">3 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Patient_Encounter__c.Notes__c</code></td><td>Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Patient_Encounter__c.Referring_Facility__c</code></td><td>Referring Facility</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Patient_Encounter__c.Status__c</code></td><td>Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Clinical Data -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Clinical_Data__c</span>
+                Custom Object — CHD/RHD Screening &amp; Echo Results
+                <span class="count-badge">9 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_DateTime__c</code></td><td>CHD Screening DateTime</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_Failed__c</code></td><td>CHD Screening Failed</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_Performed__c</code></td><td>CHD Screening Performed</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Clinical_Notes__c</code></td><td>Clinical Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Echo_Diagnosis__c</code></td><td>Echo Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Echo_Performed_DateTime__c</code></td><td>Echo Performed DateTime</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Hours_to_Echo__c</code></td><td>Hours to Echo</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field — calculated automatically</td></tr>
+                    <tr><td><code>Clinical_Data__c.RHD_Prophylaxis_Compliant__c</code></td><td>RHD Prophylaxis Compliant</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.RHD_Prophylaxis_Due_Date__c</code></td><td>RHD Prophylaxis Due Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- POX Screening -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">POX_Screening__c</span>
+                Custom Object — Pulse Oximetry Screening
+                <span class="count-badge">19 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>POX_Screening__c.POX1_Date__c</code></td><td>POX1 Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Leg__c</code></td><td>POX1 Leg SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_R_Hand__c</code></td><td>POX1 Right Hand SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Screener_Impression__c</code></td><td>POX1 Screener Impression</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Screening_Truth__c</code></td><td>POX1 Screening Truth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field</td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen__c</code></td><td>POX1 Supplemental Oxygen</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen_Flow_Rate__c</code></td><td>POX1 O2 Flow Rate</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen_Mask__c</code></td><td>POX1 O2 Mask</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Time__c</code></td><td>POX1 Time</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Date__c</code></td><td>POX2 Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Leg__c</code></td><td>POX2 Leg SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_R_Hand__c</code></td><td>POX2 Right Hand SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Screener_Impression__c</code></td><td>POX2 Screener Impression</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Screening_Truth__c</code></td><td>POX2 Screening Truth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field</td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen__c</code></td><td>POX2 Supplemental Oxygen</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen_Flow_Rate__c</code></td><td>POX2 O2 Flow Rate</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen_Mask__c</code></td><td>POX2 O2 Mask</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Time__c</code></td><td>POX2 Time</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX_Testing_Absent_Reason__c</code></td><td>POX Testing Absent Reason</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.Repeat_POX__c</code></td><td>Repeat POX</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Heart Disease Follow Up -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Heart_Disease_Follow_Up__c</span>
+                Custom Object — HD Follow-Up Tracking
+                <span class="count-badge">8 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Acquired_HD__c</code></td><td>Acquired HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Congenital_HD__c</code></td><td>Congenital HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Expected_FollowUp__c</code></td><td>Expected Follow-Up</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.FollowUp_Critical__c</code></td><td>Follow-Up Critical</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Quaternary_Diagnosis__c</code></td><td>Quaternary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Rheumatic_HD__c</code></td><td>Rheumatic HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Secondary_Diagnosis__c</code></td><td>Secondary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Tertiary_Diagnosis__c</code></td><td>Tertiary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Maternal Obstetric Info -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Maternal_Obstetric_Info__c</span>
+                Custom Object — Maternal &amp; Obstetric Data
+                <span class="count-badge">7 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Birth_Weight__c</code></td><td>Birth Weight</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Child__c</code></td><td>Child</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Delivery_Date__c</code></td><td>Delivery Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Delivery_Type__c</code></td><td>Delivery Type</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Gestational_Age__c</code></td><td>Gestational Age</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Pregnancy_Complications__c</code></td><td>Pregnancy Complications</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Prenatal_CHD_Detected__c</code></td><td>Prenatal CHD Detected</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Quality Safety Event -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Quality_Safety_Event__c</span>
+                Custom Object — Patient Safety Events
+                <span class="count-badge">8 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Quality_Safety_Event__c.Assigned_To__c</code></td><td>Assigned To</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Corrective_Actions__c</code></td><td>Corrective Actions</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Description__c</code></td><td>Description</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Patient_Encounter__c</code></td><td>Patient Encounter</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Patient__c</code></td><td>Patient</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Resolution_Date__c</code></td><td>Resolution Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Root_Cause__c</code></td><td>Root Cause</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Status__c</code></td><td>Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Admin Tabs & App -->
+            <h3 id="admin-tabs">Tab Visibility &amp; App Access</h3>
+            <div class="table-scroll">
+            <table>
+              <thead><tr><th>Tab / Application</th><th>Type</th><th>Access Level</th></tr></thead>
+              <tbody>
+                <tr><td><code>KCMC_Cardiac_Centre</code></td><td>Lightning Application</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Family_Unit__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Patient_Encounter__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Heart_Disease_Follow_Up__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>POX_Screening__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Maternal_Obstetric_Info__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Quality_Safety_Event__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+              </tbody>
+            </table>
+            </div>
+
+          </div><!-- /ps-card-body -->
+        </div><!-- /ps-card -->
+
+
+        <!-- ═══════════════════════════════════════
+             KCMC CARDIAC USER
+        ════════════════════════════════════════ -->
+        <h2 id="user">KCMC Cardiac User</h2>
+
+        <div class="ps-card">
+          <div class="ps-card-header user">
+            <div class="ps-icon">👤</div>
+            <div>
+              <h3>KCMC Cardiac User</h3>
+              <p>Standard user permission set for KCMC Cardiac Centre. Grants access to all custom objects and fields required for pediatric cardiac care management. No delete or modify-all privileges.</p>
+              <span class="ps-api-name">KCMC_Cardiac_User</span>
+            </div>
+          </div>
+          <div class="ps-card-body">
+            <div class="badge-row">
+              <span class="badge badge-green">Read + Create + Edit</span>
+              <span class="badge badge-red">No Delete</span>
+              <span class="badge badge-orange">No Modify All</span>
+              <span class="badge badge-blue">9 Objects</span>
+              <span class="badge badge-blue">6 Tabs Visible</span>
+              <span class="badge badge-green">App Access</span>
+            </div>
+
+            <!-- User Object Permissions -->
+            <h3 id="user-objects">Object Permissions</h3>
+            <p>The User permission set provides <strong>Read, Create, and Edit</strong> access across all objects but does not grant Delete or Modify All. View All Records is selectively enabled on objects where full patient visibility is clinically important.</p>
+
+            <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Object</th>
+                  <th>Type</th>
+                  <th>Create</th>
+                  <th>Read</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                  <th>View All</th>
+                  <th>Modify All</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="obj-name">Account</span></td>
+                  <td>Standard</td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Contact</span></td>
+                  <td>Standard</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Family_Unit__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Patient_Encounter__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Clinical_Data__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">POX_Screening__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Heart_Disease_Follow_Up__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Maternal_Obstetric_Info__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+                <tr>
+                  <td><span class="obj-name">Quality_Safety_Event__c</span></td>
+                  <td>Custom</td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                  <td><span class="perm-yes">✔</span></td>
+                  <td><span class="perm-no">—</span></td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+
+            <div class="callout callout-success">
+              <strong>Selective View All Records</strong>
+              View All Records is enabled on <code>Contact</code>, <code>Heart_Disease_Follow_Up__c</code>, <code>Maternal_Obstetric_Info__c</code>, and <code>Quality_Safety_Event__c</code> — ensuring clinical staff can access all patient records regardless of ownership, critical in a shared-care hospital setting.
+            </div>
+
+            <div class="callout callout-warn">
+              <strong>Account Restrictions</strong>
+              Users cannot create new Account (facility) records. This is intentional — facility data is managed by administrators. Users have read and edit access to existing facility records only.
+            </div>
+
+            <!-- User Field Permissions -->
+            <h3 id="user-fields">Field-Level Permissions</h3>
+            <p>Field-level permissions are <strong>identical to the Admin permission set</strong> — all fields are Read + Edit, with formula fields restricted to read-only as required by Salesforce. The distinction between these two permission sets lies entirely at the object level.</p>
+
+            <!-- Account -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Account</span>
+                Standard Object — Facility Information
+                <span class="count-badge">2 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Account.Facility_Type__c</code></td><td>Facility Type</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Account.Region__c</code></td><td>Region</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Contact</span>
+                Standard Object — Patient / Family Member
+                <span class="count-badge">20 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Contact.Apgar_1_Minute__c</code></td><td>Apgar Score (1 min)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Apgar_5_Minute__c</code></td><td>Apgar Score (5 min)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Birth_Weight_kg__c</code></td><td>Birth Weight (kg)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Caretaker_Email__c</code></td><td>Caretaker Email</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Caretaker_Phone__c</code></td><td>Caretaker Phone</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Diagnosis_Category__c</code></td><td>Diagnosis Category</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Family_Role__c</code></td><td>Family Role</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Family_Unit__c</code></td><td>Family Unit</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Gender__c</code></td><td>Gender</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Gestational_Age_Weeks__c</code></td><td>Gestational Age (weeks)</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Medical_Record_Number__c</code></td><td>Medical Record Number</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.MRN_Not_Yet_Assigned__c</code></td><td>MRN Not Yet Assigned</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.National_MRN__c</code></td><td>National MRN</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Next_Follow_Up_Date__c</code></td><td>Next Follow-Up Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_Account__c</code></td><td>Other Account</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_Account_MRN__c</code></td><td>Other Account MRN</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Other_SDOH_Details__c</code></td><td>Other SDOH Details</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Patient_Status__c</code></td><td>Patient Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Social_Determinants_of_Health__c</code></td><td>Social Determinants of Health</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Contact.Time_of_Birth__c</code></td><td>Time of Birth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Family Unit -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Family_Unit__c</span>
+                Custom Object — Household / Family Group
+                <span class="count-badge">5 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Family_Unit__c.District__c</code></td><td>District</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Notes__c</code></td><td>Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Phone__c</code></td><td>Phone</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Residence_Address__c</code></td><td>Residence Address</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Family_Unit__c.Village__c</code></td><td>Village</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Patient Encounter -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Patient_Encounter__c</span>
+                Custom Object — Clinical Visit Record
+                <span class="count-badge">3 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Patient_Encounter__c.Notes__c</code></td><td>Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Patient_Encounter__c.Referring_Facility__c</code></td><td>Referring Facility</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Patient_Encounter__c.Status__c</code></td><td>Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Clinical Data -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Clinical_Data__c</span>
+                Custom Object — CHD/RHD Screening &amp; Echo Results
+                <span class="count-badge">9 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_DateTime__c</code></td><td>CHD Screening DateTime</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_Failed__c</code></td><td>CHD Screening Failed</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.CHD_Screening_Performed__c</code></td><td>CHD Screening Performed</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Clinical_Notes__c</code></td><td>Clinical Notes</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Echo_Diagnosis__c</code></td><td>Echo Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Echo_Performed_DateTime__c</code></td><td>Echo Performed DateTime</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.Hours_to_Echo__c</code></td><td>Hours to Echo</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field — calculated automatically</td></tr>
+                    <tr><td><code>Clinical_Data__c.RHD_Prophylaxis_Compliant__c</code></td><td>RHD Prophylaxis Compliant</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>Clinical_Data__c.RHD_Prophylaxis_Due_Date__c</code></td><td>RHD Prophylaxis Due Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- POX Screening -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">POX_Screening__c</span>
+                Custom Object — Pulse Oximetry Screening
+                <span class="count-badge">20 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>POX_Screening__c.POX1_Date__c</code></td><td>POX1 Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Leg__c</code></td><td>POX1 Leg SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_R_Hand__c</code></td><td>POX1 Right Hand SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Screener_Impression__c</code></td><td>POX1 Screener Impression</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Screening_Truth__c</code></td><td>POX1 Screening Truth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field</td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen__c</code></td><td>POX1 Supplemental Oxygen</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen_Flow_Rate__c</code></td><td>POX1 O2 Flow Rate</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Supplemental_Oxygen_Mask__c</code></td><td>POX1 O2 Mask</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX1_Time__c</code></td><td>POX1 Time</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Date__c</code></td><td>POX2 Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Leg__c</code></td><td>POX2 Leg SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_R_Hand__c</code></td><td>POX2 Right Hand SpO2</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Screener_Impression__c</code></td><td>POX2 Screener Impression</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Screening_Truth__c</code></td><td>POX2 Screening Truth</td><td><span class="perm-yes">✔</span></td><td><span class="perm-ro">R/O</span></td><td>Formula field</td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen__c</code></td><td>POX2 Supplemental Oxygen</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen_Flow_Rate__c</code></td><td>POX2 O2 Flow Rate</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Supplemental_Oxygen_Mask__c</code></td><td>POX2 O2 Mask</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX2_Time__c</code></td><td>POX2 Time</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.POX_Testing_Absent_Reason__c</code></td><td>POX Testing Absent Reason</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                    <tr><td><code>POX_Screening__c.Repeat_POX__c</code></td><td>Repeat POX</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Heart Disease Follow Up -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Heart_Disease_Follow_Up__c</span>
+                Custom Object — HD Follow-Up Tracking
+                <span class="count-badge">8 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Acquired_HD__c</code></td><td>Acquired HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Congenital_HD__c</code></td><td>Congenital HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Expected_FollowUp__c</code></td><td>Expected Follow-Up</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.FollowUp_Critical__c</code></td><td>Follow-Up Critical</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Quaternary_Diagnosis__c</code></td><td>Quaternary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Rheumatic_HD__c</code></td><td>Rheumatic HD</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Secondary_Diagnosis__c</code></td><td>Secondary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Heart_Disease_Follow_Up__c.Tertiary_Diagnosis__c</code></td><td>Tertiary Diagnosis</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Maternal Obstetric Info -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Maternal_Obstetric_Info__c</span>
+                Custom Object — Maternal &amp; Obstetric Data
+                <span class="count-badge">7 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Birth_Weight__c</code></td><td>Birth Weight</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Child__c</code></td><td>Child</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Delivery_Date__c</code></td><td>Delivery Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Delivery_Type__c</code></td><td>Delivery Type</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Gestational_Age__c</code></td><td>Gestational Age</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Pregnancy_Complications__c</code></td><td>Pregnancy Complications</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Maternal_Obstetric_Info__c.Prenatal_CHD_Detected__c</code></td><td>Prenatal CHD Detected</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Quality Safety Event -->
+            <div class="field-group">
+              <div class="field-group-header">
+                <span class="obj-badge">Quality_Safety_Event__c</span>
+                Custom Object — Patient Safety Events
+                <span class="count-badge">8 fields</span>
+              </div>
+              <div class="field-table-wrap">
+                <table>
+                  <thead><tr><th>Field API Name</th><th>Label</th><th>Read</th><th>Edit</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Quality_Safety_Event__c.Assigned_To__c</code></td><td>Assigned To</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Corrective_Actions__c</code></td><td>Corrective Actions</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Description__c</code></td><td>Description</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Patient_Encounter__c</code></td><td>Patient Encounter</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Patient__c</code></td><td>Patient</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Resolution_Date__c</code></td><td>Resolution Date</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Root_Cause__c</code></td><td>Root Cause</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                    <tr><td><code>Quality_Safety_Event__c.Status__c</code></td><td>Status</td><td><span class="perm-yes">✔</span></td><td><span class="perm-yes">✔</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- User Tabs & App -->
+            <h3 id="user-tabs">Tab Visibility &amp; App Access</h3>
+            <div class="table-scroll">
+            <table>
+              <thead><tr><th>Tab / Application</th><th>Type</th><th>Access Level</th></tr></thead>
+              <tbody>
+                <tr><td><code>KCMC_Cardiac_Centre</code></td><td>Lightning Application</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Family_Unit__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Patient_Encounter__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Heart_Disease_Follow_Up__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>POX_Screening__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Maternal_Obstetric_Info__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+                <tr><td><code>Quality_Safety_Event__c</code></td><td>Custom Tab</td><td><span class="perm-yes">✔</span> Visible</td></tr>
+              </tbody>
+            </table>
+            </div>
+
+          </div><!-- /ps-card-body -->
+        </div><!-- /ps-card -->
+
+      </div><!-- /content -->
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer>
+      <span>KCMC Cardiac Centre · Permission Sets Report · March 9, 2026</span>
+      <span>Source: <code>force-app/main/default/permissionsets/</code> · Foundation for Cardiovascular Care in Africa (FCCA)</span>
+    </footer>
+
+  </div><!-- /doc-shell -->
+</div><!-- /page -->
+</body>
+</html>
