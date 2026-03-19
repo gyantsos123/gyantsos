@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translation Kit Example — Data360 + MuleSoft + AWS Redshift</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --sf-blue:   #0176D3;
+        --sf-lb:     #1B96FF;
+        --aws-orange: #FF9900;
+        --aws-dark:  #232F3E;
+        --bg:        #f0f4f8;
+        --card:      #ffffff;
+        --text:      #1a1f36;
+        --muted:     #4a5568;
+        --border:    #e2e8f0;
+      }
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+
+      /* ── HEADER ── */
+      .header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .logo-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        border-radius: 12px;
+      }
+
+      .logo-box.sf {
+        background: rgba(1,118,211,0.08);
+        border: 1px solid rgba(1,118,211,0.2);
+      }
+
+      .logo-box.aws {
+        background: rgba(255,153,0,0.08);
+        border: 1px solid rgba(255,153,0,0.25);
+      }
+
+      .logo-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .logo-box.sf .logo-label { color: var(--sf-blue); }
+      .logo-box.aws .logo-label { color: var(--aws-orange); }
+
+      .doc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(1,118,211,0.1);
+        border: 1px solid rgba(1,118,211,0.25);
+        border-radius: 100px;
+        padding: 6px 16px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sf-blue);
+      }
+
+      .header-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .header-sub {
+        font-size: 0.95rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .header-sub strong { color: var(--text); }
+
+      /* ── SECTION CARD ── */
+      .section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      }
+
+      .section:last-child { margin-bottom: 0; }
+
+      .section-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        color: var(--sf-blue);
+      }
+
+      .section-label-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(1,118,211,0.12);
+        border: 1px solid rgba(1,118,211,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--sf-blue);
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+
+      .section-body {
+        font-size: 0.98rem;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .section-body p { margin-bottom: 1rem; }
+      .section-body p:last-child { margin-bottom: 0; }
+      .section-body strong { color: var(--text); font-weight: 600; }
+
+      /* ── DIAGRAM ── */
+      .arch-diagram {
+        margin-top: 20px;
+        padding: 20px 16px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: nowrap;
+      }
+
+      .arch-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        min-width: 120px;
+        text-align: center;
+      }
+
+      .arch-node.sf {
+        background: rgba(1,118,211,0.08);
+        border: 1px solid rgba(1,118,211,0.2);
+      }
+
+      .arch-node.aws {
+        background: rgba(255,153,0,0.06);
+        border: 1px solid rgba(255,153,0,0.2);
+      }
+
+      .arch-node.mid {
+        background: rgba(100,116,139,0.06);
+        border: 1px solid rgba(100,116,139,0.15);
+      }
+
+      .arch-node.data360 {
+        background: rgba(0,161,224,0.1);
+        border: 1px solid rgba(0,161,224,0.3);
+      }
+
+      .arch-node.erp {
+        background: rgba(100,116,139,0.08);
+        border: 1px solid rgba(100,116,139,0.2);
+      }
+
+      .arch-node.mule {
+        background: rgba(46,132,74,0.08);
+        border: 1px solid rgba(46,132,74,0.25);
+      }
+
+      /* complex multi-row diagram */
+      .arch-diagram-complex {
+        margin-top: 20px;
+        padding: 24px 20px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+      }
+
+      .arch-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+        margin-bottom: 16px;
+      }
+
+      .arch-row:last-child { margin-bottom: 0; }
+
+      .arch-row-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .arch-connector-v {
+        display: flex;
+        justify-content: center;
+        margin: 4px 0;
+        color: #94a3b8;
+        font-size: 1rem;
+      }
+
+      .arch-node-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .arch-node-sublabel {
+        font-size: 0.75rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .arch-arrow {
+        color: #94a3b8;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+
+      /* ── BULLET LIST ── */
+      .bullet-list {
+        list-style: none;
+        margin-top: 16px;
+      }
+
+      .bullet-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .bullet-list li:last-child { margin-bottom: 0; }
+
+      .bullet-dot {
+        flex-shrink: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-top: 8px;
+      }
+
+      .q1 .bullet-dot { background: var(--sf-blue); }
+      .q2 .bullet-dot { background: var(--aws-orange); }
+      .q3 .bullet-dot { background: #2E844A; }
+
+      /* ── SCALE WARNING BOX ── */
+      .consumption-model {
+        margin-top: 24px;
+      }
+
+      .consumption-model-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 12px;
+      }
+
+      .consumption-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .consumption-table th,
+      .consumption-table td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .consumption-table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.82rem;
+      }
+
+      .consumption-table td {
+        color: var(--muted);
+      }
+
+      .consumption-table tbody tr:last-child td { border-bottom: none; }
+
+      /* animated consumption line chart */
+      .consumption-chart-wrap {
+        margin-top: 20px;
+        padding: 20px 24px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+
+      .consumption-chart-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 16px;
+      }
+
+      .consumption-chart {
+        width: 100%;
+        height: 100px;
+      }
+
+      .consumption-line {
+        fill: none;
+        stroke: var(--sf-blue);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 280;
+        stroke-dashoffset: 280;
+        animation: line-draw 2.2s ease-out forwards;
+      }
+
+      .consumption-line-dot {
+        fill: var(--sf-blue);
+        opacity: 0;
+        animation: dot-appear 0.3s ease-out forwards;
+      }
+
+      .consumption-line-dot:nth-of-type(1) { animation-delay: 0.6s; }
+      .consumption-line-dot:nth-of-type(2) { animation-delay: 1.2s; }
+      .consumption-line-dot:nth-of-type(3) { animation-delay: 2.2s; }
+
+      @keyframes line-draw {
+        to { stroke-dashoffset: 0; }
+      }
+
+      @keyframes dot-appear {
+        to { opacity: 1; }
+      }
+
+      .consumption-chart-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding: 0 8px;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .consumption-chart-labels span {
+        flex: 1;
+        text-align: center;
+      }
+
+      .scale-box {
+        margin-top: 20px;
+        padding: 20px 24px;
+        background: rgba(255,153,0,0.06);
+        border: 1px solid rgba(255,153,0,0.2);
+        border-radius: 12px;
+        border-left: 4px solid var(--aws-orange);
+      }
+
+      .scale-box-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--aws-orange);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .scale-box-text {
+        font-size: 0.92rem;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      /* ── COMPLIANCE TABLE ── */
+      .compliance-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      .compliance-table th,
+      .compliance-table td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .compliance-table th {
+        font-weight: 600;
+        color: var(--text);
+        background: #f8fafc;
+      }
+
+      .compliance-table td {
+        color: var(--muted);
+      }
+
+      .compliance-table tr:last-child td { border-bottom: none; }
+
+      /* ── FOOTER ── */
+      .footer {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .footer-note {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        font-style: italic;
+      }
+
+      .footer-logos {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="page">
+
+      <!-- ── HEADER ── -->
+      <header class="header">
+        <div class="header-top">
+          <div class="logo-row">
+            <div class="logo-box sf">
+              <svg width="32" height="24" viewBox="0 0 300 200" fill="none">
+                <path d="M120 46C130 33 145 26 163 26C189 26 210 44 213 67C216 66 219 66 222 66C244 66 262 83 262 103C262 123 244 140 222 140H83C62 140 46 124 46 104C46 85 61 70 80 68C79 65 79 61 79 58C79 35 97 18 120 18Z" fill="#0176D3"/>
+                <path d="M138 72L118 112H143L130 148L176 97H149L163 72H138Z" fill="white" fill-opacity="0.95"/>
+              </svg>
+              <span class="logo-label">Salesforce</span>
+            </div>
+            <div class="logo-box aws">
+              <svg width="32" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="logo-label">Amazon Redshift</span>
+            </div>
+          </div>
+          <div class="doc-badge">Translation Kit · Example</div>
+        </div>
+        <h1 class="header-title">Data360 + MuleSoft + Redshift Analytics Pipeline</h1>
+        <p class="header-sub"><strong>Fictitious example:</strong> NorthStar Analytics — an SMB with ERP and Salesforce CRM feeding Data360, with AWS Redshift federated queries for unified reporting and BI. Use this as a template for your own demo-to-architecture companions.</p>
+      </header>
+
+      <!-- ── QUESTION 1 ── -->
+      <section class="section">
+        <div class="section-label">
+          <span class="section-label-num">1</span>
+          Production Architecture
+        </div>
+        <div class="section-body">
+          <p><strong>NorthStar's setup:</strong> ERP and Sales Cloud feed <strong>Data360</strong> — ERP via <strong>MuleSoft</strong>, Sales Cloud via native sync. Data360 is the central analytics hub. <strong>AWS Redshift</strong> connects via federated queries (Zero Copy); no ETL. BI tools query Redshift for high-performance analytics.</p>
+          <ul class="bullet-list q1">
+            <li><span class="bullet-dot"></span><strong>Data sources:</strong> ERP (orders, inventory, finance) via MuleSoft; Sales Cloud (Accounts, Opportunities, Contacts, Activities).</li>
+            <li><span class="bullet-dot"></span><strong>Integration path:</strong> ERP → MuleSoft → Data360; Sales Cloud → Data360; Redshift ↔ Data360 (federated queries, Zero Copy).</li>
+            <li><span class="bullet-dot"></span><strong>Data landing:</strong> Data360 harmonizes and models data. Redshift cluster in customer's AWS account queries Data360 directly — no data movement.</li>
+            <li><span class="bullet-dot"></span><strong>Consumption:</strong> BI tools (Tableau, Looker, QuickSight) query Redshift. Dashboards use federated views over Data360.</li>
+          </ul>
+          <div class="arch-diagram-complex">
+            <div class="arch-row-label">Data sources → Data360</div>
+            <div class="arch-row">
+              <div class="arch-node erp">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 7H4M20 12H4M20 17H4M3 7h.01M3 12h.01M3 17h.01" stroke="#64748b" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="arch-node-label">ERP</span>
+                <span class="arch-node-sublabel">Orders · Inventory · Finance</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node mule">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#2e844a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="arch-node-label">MuleSoft</span>
+                <span class="arch-node-sublabel">Integration</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node data360">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#00A1E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="arch-node-label">Data360</span>
+                <span class="arch-node-sublabel">Central hub · Harmonize</span>
+              </div>
+              <div class="arch-arrow" style="margin-left: 6px;">←</div>
+              <div class="arch-node sf">
+                <svg width="40" height="30" viewBox="0 0 300 200" fill="none"><path d="M120 46C130 33 145 26 163 26C189 26 210 44 213 67C216 66 219 66 222 66C244 66 262 83 262 103C262 123 244 140 222 140H83C62 140 46 124 46 104C46 85 61 70 80 68C79 65 79 61 79 58C79 35 97 18 120 18Z" fill="#0176D3"/><path d="M138 72L118 112H143L130 148L176 97H149L163 72H138Z" fill="white" fill-opacity="0.9"/></svg>
+                <span class="arch-node-label">Sales Cloud</span>
+                <span class="arch-node-sublabel">CRM</span>
+              </div>
+            </div>
+            <div class="arch-connector-v">↕ Federated queries (Zero Copy)</div>
+            <div class="arch-row-label">Analytics</div>
+            <div class="arch-row">
+              <div class="arch-node aws">
+                <svg width="32" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 7V4h16v3M9 20h6M12 4v16M5 11l7 7 7-7" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="arch-node-label">Amazon Redshift</span>
+                <span class="arch-node-sublabel">Query · BI</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node mid">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M18 9l-5 5-4-4-3 3" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="arch-node-label">BI Tools</span>
+                <span class="arch-node-sublabel">Tableau · Looker · QuickSight</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── QUESTION 2 ── -->
+      <section class="section">
+        <div class="section-label">
+          <span class="section-label-num">2</span>
+          Scaling Concerns
+        </div>
+        <div class="section-body">
+          <ul class="bullet-list q2">
+            <li><span class="bullet-dot"></span><strong>Data volume:</strong> At 10K+ opportunities, sync frequency can become a bottleneck. Move from daily batch to near-real-time or event-driven sync if they need fresher analytics.</li>
+            <li><span class="bullet-dot"></span><strong>Redshift sizing:</strong> Start with a single dc2.large node; plan for scaling to multi-node or RA3 as data grows. RA3 separates compute and storage — better for unpredictable growth.</li>
+            <li><span class="bullet-dot"></span><strong>Schema evolution:</strong> New custom fields and objects in Salesforce will require schema updates in Redshift. Document a change process so they're not surprised by manual steps.</li>
+            <li><span class="bullet-dot"></span><strong>Concurrent users:</strong> More analysts means more concurrent queries. Redshift concurrency scaling helps, but they should understand the cost model before they scale.</li>
+          </ul>
+          <div class="consumption-model">
+            <div class="consumption-model-title">3–6–14 month consumption model</div>
+            <table class="consumption-table">
+              <thead>
+                <tr>
+                  <th>Horizon</th>
+                  <th>Typical scope</th>
+                  <th>Considerations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>3 months</strong></td>
+                  <td>Pilot: Sales Cloud + core ERP entities into Data360; Redshift federated queries for 2–3 dashboards</td>
+                  <td>Validate integration paths, baseline query performance, 5–10 power users</td>
+                </tr>
+                <tr>
+                  <td><strong>6 months</strong></td>
+                  <td>Expansion: Full ERP + CRM; additional Data360 objects; more BI workloads</td>
+                  <td>Concurrency scaling, MuleSoft flow tuning, 20–30 analysts</td>
+                </tr>
+                <tr>
+                  <td><strong>14 months</strong></td>
+                  <td>Production: All sources, governed datasets, self-service BI</td>
+                  <td>RA3 or multi-node if needed; federated query optimization; cost review</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="consumption-chart-wrap">
+            <div class="consumption-chart-title">Something to consider: consumption growth over time</div>
+            <svg class="consumption-chart" viewBox="0 0 240 100" preserveAspectRatio="xMidYMid meet">
+              <path class="consumption-line" d="M 30 75 L 120 48 L 210 18" />
+              <circle class="consumption-line-dot" cx="30" cy="75" r="4" />
+              <circle class="consumption-line-dot" cx="120" cy="48" r="4" />
+              <circle class="consumption-line-dot" cx="210" cy="18" r="4" />
+            </svg>
+            <div class="consumption-chart-labels">
+              <span>3 mo</span>
+              <span>6 mo</span>
+              <span>14 mo</span>
+            </div>
+          </div>
+          <div class="scale-box">
+            <div class="scale-box-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conversation to surface early
+            </div>
+            <div class="scale-box-text">"Let's walk through a 3–6–14 month consumption model — where do you expect to be at each horizon in terms of data volume, sources, and users? That will drive Redshift sizing and integration strategy."</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── QUESTION 3 ── -->
+      <section class="section">
+        <div class="section-label">
+          <span class="section-label-num">3</span>
+          Security & Compliance
+        </div>
+        <div class="section-body">
+          <table class="compliance-table">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer / Positioning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Where does our data live?</strong></td>
+                <td>Salesforce data stays in Salesforce org; Data360 holds harmonized data. Redshift federated queries access Data360 without copying data. Customer's AWS account hosts Redshift. MuleSoft, Data360, and AWS support encryption in transit and at rest.</td>
+              </tr>
+              <tr>
+                <td><strong>Who can access the Redshift data?</strong></td>
+                <td>IAM and Redshift role-based access. Customer controls access via AWS. Recommend Lake Formation for fine-grained access if they add S3.</td>
+              </tr>
+              <tr>
+                <td><strong>Is this GDPR / CCPA compliant?</strong></td>
+                <td>Architecture supports compliance — customer controls retention, deletion, and access. Salesforce and AWS both offer DPA and compliance documentation. Data residency: choose region accordingly.</td>
+              </tr>
+              <tr>
+                <td><strong>Can we audit who queried what?</strong></td>
+                <td>Redshift supports query logging and CloudTrail. Salesforce provides audit logs. Recommend a unified audit strategy for compliance reviews.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="footer">
+        <span class="footer-note">Fictitious example for enablement — NorthStar Analytics is not a real customer.</span>
+        <div class="footer-logos">
+          <svg width="24" height="18" viewBox="0 0 300 200" fill="none"><path d="M120 46C130 33 145 26 163 26C189 26 210 44 213 67C216 66 219 66 222 66C244 66 262 83 262 103C262 123 244 140 222 140H83C62 140 46 124 46 104C46 85 61 70 80 68C79 65 79 61 79 58C79 35 97 18 120 18Z" fill="#0176D3"/><path d="M138 72L118 112H143L130 148L176 97H149L163 72H138Z" fill="white" fill-opacity="0.8"/></svg>
+          <span style="color:#94a3b8;font-size:0.8rem;">+</span>
+          <svg width="24" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 7V4h16v3M9 20h6M12 4v16M5 11l7 7 7-7" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>
