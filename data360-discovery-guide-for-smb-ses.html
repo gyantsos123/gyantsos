@@ -12,6 +12,7 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/docx@latest/build/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@latest/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
       :root {
         --sf-blue: #0176d3;
@@ -40,15 +41,29 @@
         font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
         color: var(--text);
         background:
-          radial-gradient(circle at 20% -10%, rgba(1, 118, 211, 0.22), transparent 42%),
-          radial-gradient(circle at 90% 10%, rgba(0, 191, 255, 0.16), transparent 32%),
-          var(--bg);
+          radial-gradient(circle at 12% 14%, rgba(87, 163, 253, 0.28) 0%, rgba(87, 163, 253, 0) 34%),
+          radial-gradient(circle at 88% 18%, rgba(27, 150, 255, 0.25) 0%, rgba(27, 150, 255, 0) 30%),
+          linear-gradient(135deg, #032d60 0%, #0b5cab 50%, #0176d3 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+      }
+
+      #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        background: linear-gradient(135deg, #032d60 0%, #0b5cab 50%, #0176d3 100%);
       }
 
       .app {
         max-width: 1120px;
         margin: 0 auto;
         padding: 22px 18px 48px;
+        position: relative;
+        z-index: 1;
       }
 
       .hero {
@@ -358,6 +373,7 @@
     </style>
   </head>
   <body>
+    <div id="particles-js"></div>
     <main class="app">
       <header class="hero">
         <div class="hero-top">
@@ -838,6 +854,96 @@
         flashButton("downloadFromSubmitBtn");
         setStatus("Downloaded .txt file with all prompts and responses.");
       });
+
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      if (window.particlesJS) {
+        particlesJS("particles-js", {
+          particles: {
+            number: {
+              value: isMobile ? 30 : 80,
+              density: {
+                enable: true,
+                value_area: isMobile ? 600 : 800
+              }
+            },
+            color: {
+              value: ["#57A3FD", "#1B96FF", "#E5F2FF", "#ffffff"]
+            },
+            shape: { type: "circle" },
+            opacity: {
+              value: 0.6,
+              random: true,
+              anim: {
+                enable: !isMobile,
+                speed: 1,
+                opacity_min: 0.1,
+                sync: false
+              }
+            },
+            size: {
+              value: isMobile ? 3 : 4,
+              random: true,
+              anim: {
+                enable: !isMobile,
+                speed: 2,
+                size_min: 0.5,
+                sync: false
+              }
+            },
+            line_linked: {
+              enable: true,
+              distance: isMobile ? 120 : 150,
+              color: "#57A3FD",
+              opacity: isMobile ? 0.2 : 0.3,
+              width: 1
+            },
+            move: {
+              enable: true,
+              speed: isMobile ? 1 : 2,
+              direction: "none",
+              random: true,
+              straight: false,
+              out_mode: "out",
+              bounce: false
+            }
+          },
+          interactivity: {
+            detect_on: "window",
+            events: {
+              onhover: {
+                enable: true,
+                mode: ["grab", "bubble"]
+              },
+              onclick: {
+                enable: true,
+                mode: "push"
+              },
+              resize: true
+            },
+            modes: {
+              grab: {
+                distance: 200,
+                line_linked: { opacity: 1 }
+              },
+              bubble: {
+                distance: 200,
+                size: 8,
+                duration: 0.3,
+                opacity: 1,
+                speed: 3
+              },
+              repulse: {
+                distance: 150,
+                duration: 0.4
+              },
+              push: {
+                particles_nb: isMobile ? 2 : 4
+              }
+            }
+          },
+          retina_detect: true
+        });
+      }
 
     </script>
   </body>
