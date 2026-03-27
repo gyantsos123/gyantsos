@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data360 Discovery Guide For SMB SEs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/docx@latest/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@latest/dist/FileSaver.min.js"></script>
+    <style>
+      :root {
+        --sf-blue: #0176d3;
+        --sf-blue-deep: #014486;
+        --sf-blue-soft: rgba(1, 118, 211, 0.1);
+        --text: #1a1f36;
+        --muted: #4a5568;
+        --border: #dbe3ec;
+        --bg: #eef4fb;
+        --card: #ffffff;
+        --shadow: 0 12px 36px rgba(3, 45, 96, 0.12);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 20% -10%, rgba(1, 118, 211, 0.22), transparent 42%),
+          radial-gradient(circle at 90% 10%, rgba(0, 191, 255, 0.16), transparent 32%),
+          var(--bg);
+      }
+
+      .app {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 22px 18px 48px;
+      }
+
+      .hero {
+        background: linear-gradient(145deg, rgba(1, 118, 211, 0.96), rgba(1, 74, 159, 0.98));
+        color: #fff;
+        border-radius: 22px;
+        padding: 26px 28px;
+        box-shadow: var(--shadow);
+        margin-bottom: 18px;
+      }
+
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 108px;
+        height: 58px;
+      }
+
+      .badge {
+        display: inline-flex;
+        padding: 5px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 12px 0 10px;
+        font-size: clamp(1.35rem, 2.2vw, 2rem);
+        line-height: 1.2;
+      }
+
+      .lead {
+        margin: 0;
+        font-size: 0.98rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.94);
+        max-width: 72ch;
+      }
+
+      .top-actions {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 120ms ease, box-shadow 160ms ease, filter 160ms ease, background 160ms ease, color 160ms ease;
+        box-shadow: 0 4px 10px rgba(9, 30, 66, 0.18);
+      }
+
+      .btn-primary {
+        background: #fff;
+        color: var(--sf-blue-deep);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.13);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.28);
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.03);
+      }
+
+      .btn:active {
+        transform: translateY(1px) scale(0.99);
+        box-shadow: 0 2px 6px rgba(9, 30, 66, 0.2);
+      }
+
+      .btn:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.45);
+        outline-offset: 2px;
+      }
+
+      .btn.clicked {
+        animation: buttonPulse 320ms ease;
+        filter: brightness(0.94);
+        box-shadow: 0 1px 4px rgba(9, 30, 66, 0.25);
+      }
+
+      @keyframes buttonPulse {
+        0% {
+          transform: scale(1);
+        }
+        40% {
+          transform: scale(0.97);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 16px;
+      }
+
+      .toc {
+        position: sticky;
+        top: 12px;
+        align-self: start;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: 0 6px 26px rgba(15, 23, 42, 0.08);
+        padding: 14px 14px 10px;
+        backdrop-filter: blur(6px);
+      }
+
+      .toc h2 {
+        margin: 0 0 8px;
+        font-size: 0.9rem;
+      }
+
+      .toc a {
+        display: block;
+        text-decoration: none;
+        color: var(--muted);
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        line-height: 1.35;
+        margin-bottom: 2px;
+      }
+
+      .toc a:hover {
+        background: var(--sf-blue-soft);
+        color: var(--sf-blue-deep);
+      }
+
+      .content {
+        min-width: 0;
+      }
+
+      .section-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .section-header {
+        padding: 18px 18px 15px;
+        border-bottom: 1px solid #edf2f7;
+        background: linear-gradient(180deg, #f9fcff, #ffffff);
+      }
+
+      .section-title {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+      }
+
+      .why {
+        margin: 0;
+        color: #24405e;
+        background: #eef6ff;
+        border: 1px solid #c8def8;
+        border-left: 4px solid var(--sf-blue);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-style: italic;
+        line-height: 1.65;
+      }
+
+      .section-note {
+        margin: 0 0 10px;
+        color: #51606f;
+        background: #f8fafc;
+        border: 1px dashed #c9d5e4;
+        border-radius: 10px;
+        padding: 9px 11px;
+        font-size: 0.86rem;
+        line-height: 1.5;
+      }
+
+      .questions {
+        padding: 14px 16px 16px;
+      }
+
+      .question {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 12px 10px;
+        margin-bottom: 10px;
+      }
+
+      .question:last-child {
+        margin-bottom: 0;
+      }
+
+      .question label {
+        display: block;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: var(--text);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      textarea {
+        width: 100%;
+        border: 1px solid #cdd8e5;
+        border-radius: 9px;
+        min-height: 92px;
+        resize: vertical;
+        font: inherit;
+        font-size: 0.9rem;
+        color: var(--text);
+        padding: 10px 11px;
+        line-height: 1.55;
+        background: #fbfdff;
+      }
+
+      textarea:focus {
+        border-color: var(--sf-blue);
+        outline: 3px solid rgba(1, 118, 211, 0.14);
+      }
+
+      .submit-wrap {
+        margin-top: 18px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .submit-wrap .btn-primary {
+        background: var(--sf-blue);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(1, 118, 211, 0.32);
+      }
+
+      .submit-wrap .btn-secondary {
+        background: #fff;
+        color: var(--sf-blue-deep);
+        border: 1px solid #bfd8f4;
+        box-shadow: 0 4px 10px rgba(1, 118, 211, 0.2);
+      }
+
+      .status {
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      .status.flash {
+        color: #0f4c81;
+        font-weight: 600;
+      }
+
+      .btn-stack {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .btn-note {
+        margin: 0;
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.3;
+      }
+
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .toc {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <div class="hero-top">
+          <div class="brand">
+            <svg class="logo" viewBox="0 0 220 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="sfCloudBlue" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#00a1e0" />
+                  <stop offset="100%" stop-color="#0176d3" />
+                </linearGradient>
+              </defs>
+              <path
+                fill="url(#sfCloudBlue)"
+                d="M57 99c-19.8 0-35.8-14.7-35.8-33 0-13.2 8.2-24.7 20.3-29.8C44.7 22.4 57.8 13 73.5 13c16.8 0 31.2 10.2 35.8 24.6a33 33 0 0 1 23.7-9.4c18.7 0 33.9 14.6 33.9 32.8 0 1.6-.1 3.1-.3 4.6 12.8 3.3 22.1 14.1 22.1 27.1 0 15.7-13.1 28.4-29.3 28.4H57z"
+              />
+              <text
+                x="110"
+                y="74"
+                text-anchor="middle"
+                font-size="33"
+                font-family="'Trebuchet MS', 'Arial Rounded MT Bold', Arial, sans-serif"
+                fill="#ffffff"
+                font-weight="700"
+                letter-spacing="-0.2"
+              >
+                salesforce
+              </text>
+            </svg>
+            <div>
+              <div class="badge">SMB Solution Engineering</div>
+            </div>
+          </div>
+        </div>
+        <h1>Data360 Discovery Guide For SMB SEs</h1>
+        <p class="lead">
+          SMB-focused discovery guide for fast, practical conversations. Capture business goals and delivery realities without assuming enterprise-level data teams, complex MDM,
+          or advanced AI maturity.
+        </p>
+        <div class="top-actions">
+          <div class="btn-stack">
+            <button class="btn btn-primary" type="button" id="downloadDocxBtn">Download Responses (.docx)</button>
+            <p class="btn-note">Then upload/open this file in Google Docs for editing.</p>
+          </div>
+          <button class="btn btn-secondary" type="button" id="copyRichTextBtn">Copy Rich Text</button>
+          <button class="btn btn-secondary" type="button" id="downloadBtn">Download Responses (.txt)</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <nav class="toc" aria-label="Guide sections">
+          <h2>Sections</h2>
+          <div id="tocLinks"></div>
+        </nav>
+
+        <section class="content" id="guideForm"></section>
+      </div>
+    </main>
+
+    <script>
+      const sections = [
+        {
+          id: "strategic-goals",
+          title: "Strategic Goals / Business Objectives (Discovery 1 - Qualification)",
+          note: "* This part of the discovery should be led by the AE. These questions help determine whether this is a qualified Data Cloud opportunity.",
+          why: "For SMB customers, this section confirms urgency, business value, and owner accountability before deep technical discovery. Keep answers focused on near-term outcomes and measurable wins.",
+          questions: [
+            "What business problem are you trying to solve in the next 6 to 12 months?",
+            "What would success look like by the end of year one (for example revenue lift, better conversion, reduced churn)?",
+            "Who owns this initiative on the business side and who will make final decisions?",
+            "What are your top one to three go-live priorities for Data Cloud?",
+            "What is hardest today: finding customer data, trusting data quality, or activating quickly?",
+            "If this project is successful, what changes for your team day-to-day?",
+            "Do you currently use a data warehouse/lake, or mostly application-level reporting?",
+            "What growth goals matter most by channel (email, web, paid media, SMS, app)?"
+          ]
+        },
+        {
+          id: "high-level-architecture",
+          title: "High Level Architecture",
+          note: "* Use these questions only after internal AE/SE alignment confirms there is enough business value to continue into technical discovery.",
+          why: "SMB architecture discovery should identify what exists today, what is realistic to integrate first, and where implementation risk is lowest for a Phase 1 rollout.",
+          questions: [
+            "Which core systems should be connected first (for example CRM, ecommerce platform, ESP, support tool)?",
+            "Who uses each of these systems today (marketing, sales, service, analytics)?",
+            "Do you already have a data warehouse/lake, or is data mostly inside business apps?",
+            "Do you have an IT partner or admin who can support integrations in Phase 1?",
+            "Do you have cloud preferences or restrictions (AWS, Azure, GCP), or is flexibility acceptable?"
+          ]
+        },
+        {
+          id: "data-ingestion",
+          title: "Data Ingestion",
+          note: "* Target someone with IT and data visibility. In SMB accounts this can be an admin, operations lead, or BI/data owner.",
+          why: "For SMB customers, clean scoping comes from identifying highest-value sources and realistic data volumes. Estimation ranges are acceptable when exact row counts are unavailable.",
+          questions: [
+            "What are the top data sources you need first for go-live (customer, orders, engagement, support)?",
+            "Do you need real-time data for any use case, or is scheduled batch sufficient?",
+            "How many marketable customers do you have today (exact or estimated range)?",
+            "How fast is that audience growing year-over-year (estimated percentage)?",
+            "Roughly how much web/app engagement data is generated monthly or yearly?",
+            "Are there additional data sources that matter for segmentation (loyalty, POS, subscription, billing)?",
+            "For each priority source, do you prefer API integration, file drop, or native connector?"
+          ]
+        },
+        {
+          id: "transform-modeling",
+          title: "Data Transformations & Modeling",
+          note: "* Target someone with oversight of data quality and integration decisions. A data steward, BI owner, or technical admin is ideal.",
+          why: "SMB teams often need lightweight, repeatable transformations rather than heavy custom pipelines. This section assesses readiness and identifies where Salesforce should simplify setup.",
+          questions: [
+            "What data quality issues are most common today (missing fields, duplicates, inconsistent formats)?",
+            "Do you have documented schemas/field definitions for your key sources?",
+            "Who on your team can own data mapping and validation?",
+            "Do you use any middleware or ETL tools today? If yes, which ones?",
+            "On a scale of 1 to 10, how would you rate current data hygiene and trust?"
+          ]
+        },
+        {
+          id: "profile-unification",
+          title: "Customer Profile Unification",
+          note: "* Unified profile is a key topic for almost every customer. Clarify what teams will do with that view, not just that they want one.",
+          why: "Many SMB customers need a practical single customer view quickly. Focus on identity basics, consent readiness, and who uses the unified profile first.",
+          questions: [
+            "What stable identifiers do you already have (email, phone, CRM ID, ecommerce ID)?",
+            "Where does known customer data live today?",
+            "How do you define an active customer today?",
+            "Do you currently have any unified customer profile process or tool?",
+            "What matching logic feels acceptable for Phase 1 (exact match only vs adding fuzzy logic later)?",
+            "How do you manage customer consent and communication preferences today?",
+            "Which teams need to view the unified profile first (marketing, sales, service)?",
+            "Does profile data need to be real-time for those teams, or is daily refresh acceptable?"
+          ]
+        },
+        {
+          id: "segmentation-activation",
+          title: "Segmentation & Activation",
+          note: "* Segmentation defines how audiences are built; activation defines where they are used and how often they refresh.",
+          why: "This section prioritizes executable use cases for SMB teams. Keep scope tight: a few high-impact segments and clear activation targets usually outperform broad enterprise-style designs.",
+          questions: [
+            "What are your top one to three segmentation and activation goals this year?",
+            "What is hardest in your current campaign execution process?",
+            "Which audiences do you wish you could build today but cannot?",
+            "Which channels are in scope for activation first (email, SMS, paid media, web personalization)?",
+            "Do you need real-time triggers, or are scheduled segment refreshes enough?",
+            "How many active campaigns/journeys usually run at the same time?",
+            "How often should segments refresh (daily, twice daily, hourly)?",
+            "Who is your current ESP and messaging provider?",
+            "Which advertising platforms are priority for audience activation?",
+            "Do other teams (sales/service/loyalty) need to consume these segments?"
+          ]
+        },
+        {
+          id: "insights-analytics-bi",
+          title: "Insights, Analytics & BI",
+          note: "* This section confirms how customer intelligence is consumed by business users, analysts, and leaders.",
+          why: "For SMB accounts, analytics requirements should focus on high-value dashboards and practical adoption by business users, not broad report sprawl.",
+          questions: [
+            "What BI/reporting tools do you use today?",
+            "What are the top decisions these dashboards should help improve?",
+            "What customer insights are highest priority (for example churn risk, engagement, LTV)?",
+            "How many users need direct dashboard access initially?",
+            "How often do reports need refresh (daily/weekly/near real-time)?"
+          ]
+        },
+        {
+          id: "ai-ml",
+          title: "AI & Machine Learning",
+          note: "* AI questions should assess both immediate business-user needs and longer-term technical maturity.",
+          why: "SMB AI discovery should separate immediate business-user AI needs from advanced data science asks. Start with what can be adopted quickly and expanded later.",
+          questions: [
+            "Are you currently using any AI/ML models today? If yes, which ones?",
+            "What AI outcomes are most useful in the next 12 months?",
+            "Do you have in-house data science resources, or do business users need no-code AI experiences?",
+            "If technical teams exist, what tools/languages do they use (for example Python, notebooks, cloud ML platforms)?",
+            "Are you interested in bring-your-own-model now, or as a later phase?"
+          ]
+        },
+        {
+          id: "customer-service",
+          title: "Customer Service",
+          note: "* Unified data can improve support quality and efficiency quickly, even with a small service team.",
+          why: "Even for SMB, service outcomes improve quickly when agents see relevant customer context. This section identifies concrete support improvements enabled by unified data.",
+          questions: [
+            "Where does missing customer context cause friction in service today?",
+            "What service metrics should improve with better customer data (for example first-contact resolution, handle time, CSAT)?",
+            "Do service teams need segment or profile data surfaced in their daily workflow?"
+          ]
+        },
+        {
+          id: "governance",
+          title: "Data & Organizational Governance",
+          note: "* These questions assess organizational setup, data access boundaries, and whether separate Data Spaces are needed.",
+          why: "Governance for SMB should remain practical: clear ownership, simple access controls, consent handling, and retention policies that meet compliance without over-engineering.",
+          questions: [
+            "How is your business organized (for example by brand, geography, or business unit)?",
+            "Who will own Data Cloud governance and ongoing administration?",
+            "What user access controls are required for Phase 1?",
+            "Do you need data separation by brand/region, or a single shared model?",
+            "Where is consent data stored today, and does it need centralization?",
+            "What are your data retention requirements?",
+            "Do you already have a phased rollout plan?"
+          ]
+        }
+      ];
+
+      const tocLinks = document.getElementById("tocLinks");
+      const guideForm = document.getElementById("guideForm");
+      let globalQuestionIndex = 1;
+
+      sections.forEach((section) => {
+        const link = document.createElement("a");
+        link.href = `#${section.id}`;
+        link.textContent = section.title;
+        tocLinks.appendChild(link);
+
+        const card = document.createElement("article");
+        card.className = "section-card";
+        card.id = section.id;
+
+        const header = document.createElement("div");
+        header.className = "section-header";
+        header.innerHTML = `<h2 class="section-title">${section.title}</h2><p class="section-note">${section.note || ""}</p><p class="why">${section.why}</p>`;
+
+        const qWrap = document.createElement("div");
+        qWrap.className = "questions";
+
+        section.questions.forEach((question) => {
+          const qId = `q${globalQuestionIndex}`;
+          const q = document.createElement("div");
+          q.className = "question";
+          q.innerHTML = `
+            <label for="${qId}">${globalQuestionIndex}. ${question}</label>
+            <textarea id="${qId}" data-question="${question}" data-section="${section.title}" placeholder="SE response..."></textarea>
+          `;
+          qWrap.appendChild(q);
+          globalQuestionIndex += 1;
+        });
+
+        card.appendChild(header);
+        card.appendChild(qWrap);
+        guideForm.appendChild(card);
+      });
+
+      const actionPanel = document.createElement("div");
+      actionPanel.className = "submit-wrap";
+      actionPanel.innerHTML = `
+        <button class="btn btn-primary" id="submitBtn" type="button">Submit & Prepare Output</button>
+        <button class="btn btn-secondary" id="downloadFromSubmitBtn" type="button">Download Document</button>
+        <span class="status" id="statusText">No submission yet.</span>
+      `;
+      guideForm.appendChild(actionPanel);
+
+      const statusText = document.getElementById("statusText");
+      let cachedOutput = "";
+
+      function flashButton(buttonId) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        button.classList.remove("clicked");
+        void button.offsetWidth;
+        button.classList.add("clicked");
+        if (button.animate) {
+          button.animate(
+            [
+              { transform: "translateY(0) scale(1)" },
+              { transform: "translateY(1px) scale(0.97)" },
+              { transform: "translateY(0) scale(1)" }
+            ],
+            { duration: 260, easing: "ease-out" }
+          );
+        }
+        setTimeout(() => button.classList.remove("clicked"), 380);
+      }
+
+      function setStatus(message, isFlash = true) {
+        statusText.textContent = message;
+        statusText.classList.remove("flash");
+        if (isFlash) {
+          void statusText.offsetWidth;
+          statusText.classList.add("flash");
+        }
+      }
+
+      function nextPaint() {
+        return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      function buildOutputText() {
+        const stamp = new Date().toLocaleString();
+        const lines = [
+          "Data360 Discovery Guide For SMB SEs",
+          "Salesforce Solution Engineering Discovery Capture",
+          `Generated: ${stamp}`,
+          ""
+        ];
+
+        sections.forEach((section) => {
+          lines.push(section.title);
+          if (section.note) lines.push(`Comment: ${section.note}`);
+          lines.push(`Why it matters: ${section.why}`);
+          lines.push("");
+
+          const textareas = guideForm.querySelectorAll(`textarea[data-section="${section.title.replace(/"/g, '\\"')}"]`);
+          textareas.forEach((ta, idx) => {
+            lines.push(`${idx + 1}. ${ta.dataset.question}`);
+            lines.push(`Response: ${ta.value.trim() || "[No response captured]"}`);
+            lines.push("");
+          });
+          lines.push("------------------------------------------------------------");
+          lines.push("");
+        });
+
+        return lines.join("\n");
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function buildOutputHtml() {
+        const stamp = new Date().toLocaleString();
+        const chunks = [];
+        chunks.push("<h1>Data360 Discovery Guide For SMB SEs</h1>");
+        chunks.push(`<p><strong>Salesforce Solution Engineering Discovery Capture</strong><br/>Generated: ${escapeHtml(stamp)}</p>`);
+
+        sections.forEach((section) => {
+          chunks.push(`<h2>${escapeHtml(section.title)}</h2>`);
+          if (section.note) {
+            chunks.push(`<p><strong>Comment:</strong> ${escapeHtml(section.note)}</p>`);
+          }
+          chunks.push(`<p><em><strong>Why it matters:</strong> ${escapeHtml(section.why)}</em></p>`);
+
+          const textareas = guideForm.querySelectorAll(`textarea[data-section="${section.title.replace(/"/g, '\\"')}"]`);
+          chunks.push("<ol>");
+          textareas.forEach((ta) => {
+            const response = ta.value.trim() || "[No response captured]";
+            chunks.push(`<li><p><strong>${escapeHtml(ta.dataset.question)}</strong><br/>Response: ${escapeHtml(response)}</p></li>`);
+          });
+          chunks.push("</ol>");
+        });
+
+        return chunks.join("\n");
+      }
+
+      async function copyRichTextToClipboard() {
+        const plain = cachedOutput || buildOutputText();
+        const html = buildOutputHtml();
+
+        if (navigator.clipboard && window.ClipboardItem) {
+          const item = new ClipboardItem({
+            "text/plain": new Blob([plain], { type: "text/plain" }),
+            "text/html": new Blob([html], { type: "text/html" })
+          });
+          await navigator.clipboard.write([item]);
+          return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(plain);
+          return;
+        }
+
+        const fallback = document.createElement("textarea");
+        fallback.value = plain;
+        fallback.style.position = "fixed";
+        fallback.style.left = "-9999px";
+        document.body.appendChild(fallback);
+        fallback.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(fallback);
+        if (!ok) {
+          throw new Error("Clipboard copy failed");
+        }
+      }
+
+      async function downloadDocxFile() {
+        if (!window.docx || !window.saveAs) {
+          throw new Error("DOCX libraries failed to load.");
+        }
+
+        const textareas = Array.from(document.querySelectorAll("textarea"));
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+        const children = [];
+
+        children.push(new Paragraph({ text: "Data360 Discovery Guide For SMB SEs", heading: HeadingLevel.TITLE }));
+        children.push(new Paragraph({ children: [new TextRun({ text: "Salesforce Solution Engineering Discovery Capture", bold: true })] }));
+        children.push(new Paragraph({ text: `Generated: ${new Date().toLocaleString()}` }));
+        children.push(new Paragraph({ text: "" }));
+
+        let cursor = 0;
+        sections.forEach((section) => {
+          children.push(new Paragraph({ text: section.title, heading: HeadingLevel.HEADING_1 }));
+          if (section.note) {
+            children.push(new Paragraph({ children: [new TextRun({ text: `Comment: ${section.note}`, italics: true })] }));
+          }
+          children.push(new Paragraph({ children: [new TextRun({ text: `Why it matters: ${section.why}`, italics: true })] }));
+          children.push(new Paragraph({ text: "" }));
+
+          section.questions.forEach((question, idx) => {
+            const response = textareas[cursor]?.value?.trim() || "[No response captured]";
+            cursor += 1;
+            children.push(new Paragraph({ children: [new TextRun({ text: `${idx + 1}. ${question}`, bold: true })] }));
+            children.push(new Paragraph({ text: `Response: ${response}` }));
+            children.push(new Paragraph({ text: "" }));
+          });
+        });
+
+        const doc = new Document({
+          sections: [{ properties: {}, children }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const fileName = `data360-discovery-guide-${new Date().toISOString().slice(0, 10)}.docx`;
+        window.saveAs(blob, fileName);
+      }
+
+
+      function downloadTextFile(content) {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const fileName = `data360-discovery-guide-${new Date().toISOString().slice(0, 10)}.txt`;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function submitCapture() {
+        cachedOutput = buildOutputText();
+        const answered = Array.from(document.querySelectorAll("textarea")).filter((ta) => ta.value.trim().length > 0).length;
+        const total = document.querySelectorAll("textarea").length;
+        flashButton("submitBtn");
+        setStatus(`Submission prepared. ${answered}/${total} questions answered.`);
+      }
+
+      document.getElementById("submitBtn").addEventListener("click", submitCapture);
+
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        const output = cachedOutput || buildOutputText();
+        downloadTextFile(output);
+        flashButton("downloadBtn");
+        setStatus("Downloaded .txt file with all prompts and responses.");
+      });
+
+      document.getElementById("downloadDocxBtn").addEventListener("click", async () => {
+        flashButton("downloadDocxBtn");
+        setStatus("Preparing DOCX export...");
+        await nextPaint();
+        try {
+          await downloadDocxFile();
+          setStatus("Downloaded .docx file. Upload/open it in Google Docs to continue editing.");
+        } catch (err) {
+          setStatus(`DOCX export failed: ${err.message}`);
+        }
+      });
+
+      document.getElementById("copyRichTextBtn").addEventListener("click", async () => {
+        flashButton("copyRichTextBtn");
+        setStatus("Copying rich text...");
+        await nextPaint();
+        try {
+          await copyRichTextToClipboard();
+          setStatus("Rich text copied. Paste into Google Docs, Word, or email.");
+        } catch (err) {
+          setStatus(`Copy failed: ${err.message}`);
+        }
+      });
+
+      document.getElementById("downloadFromSubmitBtn").addEventListener("click", () => {
+        const output = cachedOutput || buildOutputText();
+        downloadTextFile(output);
+        flashButton("downloadFromSubmitBtn");
+        setStatus("Downloaded .txt file with all prompts and responses.");
+      });
+
+    </script>
+  </body>
+</html>
