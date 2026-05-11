@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CNFJY0W81N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-CNFJY0W81N');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gary Yantsos | Principal Technical Architect</title>
@@ -538,6 +529,44 @@
             color: var(--gray-700);
         }
 
+        /* Highlighted (most recent / promotion) journey card */
+        .journey-card.is-current {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F3F8FF 100%);
+            border: 1px solid rgba(27, 150, 255, 0.45);
+            box-shadow:
+                0 0 0 4px rgba(27, 150, 255, 0.12),
+                0 18px 40px -18px rgba(3, 45, 96, 0.25);
+            position: relative;
+        }
+
+        .journey-card.is-current:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 0 0 4px rgba(27, 150, 255, 0.18),
+                0 0 30px rgba(27, 150, 255, 0.35),
+                0 22px 48px -18px rgba(3, 45, 96, 0.3);
+        }
+
+        .journey-card .badge-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            margin-bottom: 12px;
+            background: linear-gradient(180deg, #1B96FF 0%, #0B5CAB 100%);
+            color: #FFFFFF;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            border-radius: 999px;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 4px 10px rgba(11, 92, 171, 0.35);
+        }
+
+        .journey-card .badge-new i { font-size: 0.7rem; }
+
         /* Certifications */
         .cert-section {
             background: rgba(255, 255, 255, 0.95);
@@ -1042,8 +1071,15 @@
             </div>
             <h2 class="section-title">The Journey</h2>
             <div class="journey-grid">
+                <div class="journey-card is-current">
+                    <span class="badge-new"><i class="fas fa-star"></i> Recently Promoted</span>
+                    <div class="period">2026 – Present</div>
+                    <h4>Principal Security Architect</h4>
+                    <div class="company"><i class="fab fa-salesforce"></i> Salesforce</div>
+                    <p>Promoted into Salesforce's security architecture practice. Focused on how enterprise customers adopt, govern, and secure AI agents on the platform — translating Trust Layer, Data Cloud, and Agentforce patterns into the security conversations that matter to CISOs and architects.</p>
+                </div>
                 <div class="journey-card">
-                    <div class="period">2023 – Present</div>
+                    <div class="period">2023 – 2026</div>
                     <h4>Principal Technical Architect & Team Lead</h4>
                     <div class="company"><i class="fab fa-salesforce"></i> Salesforce</div>
                     <p>Specializing in Platform tools for the entire US East Coast. Working with 140 sellers to help SMB customers transform through the Salesforce ecosystem.</p>
@@ -1092,7 +1128,7 @@
             <div class="cert-grid">
                 <div class="cert-badge">
                     <i class="fas fa-robot"></i>
-                    <span>Agentforce Legend</span>
+                    <span>AI Specialist</span>
                 </div>
                 <div class="cert-badge">
                     <i class="fas fa-cloud"></i>
