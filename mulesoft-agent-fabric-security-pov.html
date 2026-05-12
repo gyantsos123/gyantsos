@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MuleSoft Agent Fabric &mdash; A Security Point of View</title>
+    <style>
+      :root {
+        --sf-navy: #032D60;
+        --sf-blue: #0176D3;
+        --sf-light-blue: #1B96FF;
+        --sf-sky: #00A1E0;
+        --sf-white: #FFFFFF;
+        --sf-cloud: #ECEBEA;
+        --sf-gray: #706E6B;
+        --sf-dark: #16325C;
+        --sf-orange: #FF9A3C;
+        --sf-green: #2E844A;
+        --sf-red: #EA001E;
+        --sf-purple: #9050E9;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 0;
+        background: linear-gradient(180deg, #001639 0%, #032D60 100%);
+        color: var(--sf-white);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      /* Header */
+      header {
+        padding: 48px 48px 40px;
+        background: linear-gradient(135deg, #032D60 0%, #0176D3 60%, #1B96FF 100%);
+        border-bottom: 3px solid var(--sf-light-blue);
+        position: relative;
+        overflow: hidden;
+      }
+      header::before {
+        content: '';
+        position: absolute;
+        top: -60%;
+        right: -8%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(27,150,255,0.18) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .header-eyebrow {
+        color: rgba(255,255,255,0.6);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        position: relative;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        position: relative;
+      }
+      header .subtitle {
+        color: rgba(255,255,255,0.78);
+        margin: 0;
+        font-size: 16px;
+        position: relative;
+        max-width: 760px;
+      }
+      .header-meta {
+        display: flex;
+        gap: 24px;
+        margin-top: 20px;
+        position: relative;
+        flex-wrap: wrap;
+      }
+      .header-meta span {
+        font-size: 13px;
+        color: rgba(255,255,255,0.55);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .header-meta svg { width: 14px; height: 14px; }
+
+      /* Container */
+      .container { padding: 36px 48px 64px; max-width: 1200px; margin: 0 auto; }
+
+      /* Section card */
+      .section {
+        background: linear-gradient(145deg, rgba(22,50,92,0.6) 0%, rgba(3,45,96,0.8) 100%);
+        border: 1px solid rgba(27,150,255,0.2);
+        border-radius: 12px;
+        padding: 28px 32px;
+        margin-bottom: 28px;
+        backdrop-filter: blur(8px);
+      }
+      .section h2 {
+        color: var(--sf-light-blue);
+        margin: 0 0 20px;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .section h2 svg { color: var(--sf-sky); flex-shrink: 0; }
+      .section .lead {
+        color: rgba(255,255,255,0.7);
+        font-size: 14.5px;
+        margin: -8px 0 22px;
+        line-height: 1.65;
+        max-width: 900px;
+      }
+
+      /* Exec summary boxes */
+      .exec-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 8px;
+      }
+      .exec-box {
+        background: rgba(1,118,211,0.08);
+        border: 1px solid rgba(27,150,255,0.18);
+        border-radius: 10px;
+        padding: 22px 24px;
+      }
+      .exec-box h3 {
+        color: var(--sf-sky);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        margin: 0 0 10px;
+      }
+      .exec-box p {
+        color: rgba(255,255,255,0.85);
+        margin: 0;
+        font-size: 14px;
+      }
+      .exec-box.full-width { grid-column: 1 / -1; }
+
+      /* Stats row */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .stat-card {
+        background: linear-gradient(145deg, rgba(22,50,92,0.5) 0%, rgba(3,45,96,0.7) 100%);
+        border: 1px solid rgba(27,150,255,0.2);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+      }
+      .stat-card .number {
+        font-size: 30px;
+        font-weight: 700;
+        color: var(--sf-light-blue);
+        line-height: 1.1;
+      }
+      .stat-card .label {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.55);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 6px;
+      }
+
+      /* Threat / challenge cards */
+      .challenge-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .challenge-card {
+        border-radius: 10px;
+        padding: 22px 24px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(234,0,30,0.18);
+        background: rgba(234,0,30,0.04);
+        transition: all 0.25s ease;
+      }
+      .challenge-card:hover {
+        border-color: rgba(234,0,30,0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      }
+      .challenge-card .ch-number {
+        position: absolute;
+        top: 14px;
+        right: 18px;
+        font-size: 48px;
+        font-weight: 800;
+        color: rgba(234,0,30,0.10);
+        line-height: 1;
+      }
+      .challenge-card h3 {
+        color: var(--sf-white);
+        font-size: 15px;
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .challenge-card h3 .icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .challenge-card h3 .icon.red { background: rgba(234,0,30,0.22); color: var(--sf-red); }
+      .challenge-card h3 .icon.orange { background: rgba(255,154,60,0.22); color: var(--sf-orange); }
+      .challenge-card p {
+        color: rgba(255,255,255,0.75);
+        font-size: 13.5px;
+        margin: 0;
+        line-height: 1.55;
+      }
+      .challenge-card .impact {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(234,0,30,0.18);
+        font-size: 11.5px;
+        color: var(--sf-orange);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      /* Solution mapping */
+      .solution-block {
+        display: flex;
+        gap: 20px;
+        padding: 22px 0;
+        border-bottom: 1px solid rgba(27,150,255,0.12);
+        align-items: flex-start;
+      }
+      .solution-block:last-child { border-bottom: none; }
+      .solution-number {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--sf-blue), var(--sf-light-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 15px;
+        margin-top: 2px;
+      }
+      .solution-content { flex: 1; }
+      .solution-content h3 {
+        color: var(--sf-white);
+        font-size: 16px;
+        margin: 0 0 4px;
+      }
+      .solution-content .challenge-ref {
+        font-size: 12px;
+        color: var(--sf-orange);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .solution-content p {
+        color: rgba(255,255,255,0.78);
+        font-size: 14px;
+        margin: 0 0 12px;
+      }
+      .product-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .product-tag {
+        background: linear-gradient(135deg, rgba(1,118,211,0.25), rgba(27,150,255,0.15));
+        border: 1px solid rgba(27,150,255,0.3);
+        color: var(--sf-light-blue);
+        padding: 4px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* Layered defense diagram */
+      .layers {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .layer {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        align-items: center;
+        gap: 18px;
+        padding: 16px 20px;
+        border-radius: 10px;
+        background: rgba(1,118,211,0.06);
+        border: 1px solid rgba(27,150,255,0.18);
+      }
+      .layer .layer-label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .layer .layer-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        font-weight: 700;
+        color: var(--sf-sky);
+      }
+      .layer .layer-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--sf-white);
+      }
+      .layer p {
+        margin: 0;
+        font-size: 13.5px;
+        color: rgba(255,255,255,0.75);
+        line-height: 1.55;
+      }
+      .layer.l1 { border-left: 4px solid var(--sf-sky); }
+      .layer.l2 { border-left: 4px solid var(--sf-light-blue); }
+      .layer.l3 { border-left: 4px solid var(--sf-orange); }
+      .layer.l4 { border-left: 4px solid var(--sf-green); }
+
+      /* Trust layer comparison table */
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0;
+        margin-top: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(27,150,255,0.18);
+      }
+      .compare > div {
+        padding: 16px 18px;
+        background: rgba(1,118,211,0.06);
+        border-right: 1px solid rgba(27,150,255,0.12);
+        border-bottom: 1px solid rgba(27,150,255,0.12);
+        font-size: 13.5px;
+        color: rgba(255,255,255,0.82);
+        line-height: 1.55;
+      }
+      .compare > div:nth-child(3n) { border-right: none; }
+      .compare .head {
+        background: rgba(1,118,211,0.18);
+        color: var(--sf-light-blue);
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .compare .dim {
+        font-weight: 600;
+        color: var(--sf-white);
+        background: rgba(22,50,92,0.5);
+      }
+
+      /* Roadmap */
+      .roadmap {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .phase-card {
+        border-radius: 10px;
+        padding: 22px 22px;
+        position: relative;
+        border: 1px solid rgba(27,150,255,0.15);
+        background: rgba(1,118,211,0.06);
+        transition: all 0.25s ease;
+      }
+      .phase-card:hover {
+        border-color: rgba(27,150,255,0.35);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      }
+      .phase-label {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .phase-card:nth-child(1) .phase-label { color: var(--sf-sky); }
+      .phase-card:nth-child(2) .phase-label { color: var(--sf-light-blue); }
+      .phase-card:nth-child(3) .phase-label { color: var(--sf-orange); }
+      .phase-card:nth-child(4) .phase-label { color: var(--sf-green); }
+      .phase-card h3 {
+        color: var(--sf-white);
+        font-size: 16px;
+        margin: 0 0 6px;
+      }
+      .phase-card .timeframe {
+        font-size: 12px;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: 12px;
+      }
+      .phase-card ul {
+        margin: 0;
+        padding: 0 0 0 18px;
+      }
+      .phase-card li {
+        color: rgba(255,255,255,0.78);
+        font-size: 13px;
+        margin-bottom: 7px;
+        line-height: 1.45;
+      }
+      .phase-card li::marker { color: var(--sf-light-blue); }
+
+      /* Outcomes */
+      .outcome-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .outcome-card {
+        background: rgba(1,118,211,0.06);
+        border: 1px solid rgba(27,150,255,0.12);
+        border-radius: 10px;
+        padding: 22px 22px;
+        text-align: center;
+      }
+      .outcome-card .outcome-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .outcome-card .outcome-icon.green { background: rgba(46,132,74,0.2); color: var(--sf-green); }
+      .outcome-card .outcome-icon.blue { background: rgba(27,150,255,0.15); color: var(--sf-light-blue); }
+      .outcome-card .outcome-icon.purple { background: rgba(144,80,233,0.2); color: var(--sf-purple); }
+      .outcome-card .outcome-icon svg { width: 22px; height: 22px; }
+      .outcome-card h3 {
+        color: var(--sf-white);
+        font-size: 15px;
+        margin: 0 0 6px;
+      }
+      .outcome-card p {
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      /* Case study */
+      .case-study {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+      .case-study .case-side {
+        background: linear-gradient(145deg, rgba(144,80,233,0.18), rgba(1,118,211,0.12));
+        border: 1px solid rgba(144,80,233,0.35);
+        border-radius: 10px;
+        padding: 22px 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .case-side .badge {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: var(--sf-purple);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .case-side .name {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--sf-white);
+        margin-bottom: 6px;
+      }
+      .case-side .desc {
+        font-size: 13px;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 18px;
+        line-height: 1.55;
+      }
+      .case-side .metric {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--sf-light-blue);
+        line-height: 1.1;
+      }
+      .case-side .metric-label {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+      }
+      .case-body {
+        background: rgba(1,118,211,0.06);
+        border: 1px solid rgba(27,150,255,0.18);
+        border-radius: 10px;
+        padding: 22px 24px;
+      }
+      .case-body h3 {
+        color: var(--sf-light-blue);
+        font-size: 15px;
+        margin: 0 0 10px;
+      }
+      .case-body p {
+        color: rgba(255,255,255,0.78);
+        font-size: 13.5px;
+        margin: 0 0 12px;
+        line-height: 1.6;
+      }
+      .case-body p:last-child { margin-bottom: 0; }
+      .case-body .quote {
+        border-left: 3px solid var(--sf-light-blue);
+        padding: 4px 14px;
+        margin: 14px 0;
+        color: rgba(255,255,255,0.85);
+        font-style: italic;
+        font-size: 13.5px;
+      }
+      .case-body .attribution {
+        color: rgba(255,255,255,0.5);
+        font-size: 11.5px;
+        margin-top: 4px;
+      }
+
+      /* Future vision */
+      .vision-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .vision-card {
+        background: linear-gradient(145deg, rgba(1,118,211,0.08) 0%, rgba(3,45,96,0.3) 100%);
+        border: 1px solid rgba(27,150,255,0.15);
+        border-radius: 10px;
+        padding: 22px 24px;
+        transition: all 0.25s ease;
+      }
+      .vision-card:hover {
+        border-color: rgba(27,150,255,0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      }
+      .vision-icon {
+        color: var(--sf-light-blue);
+        margin-bottom: 12px;
+        opacity: 0.9;
+      }
+      .vision-card h3 {
+        color: var(--sf-white);
+        font-size: 15px;
+        margin: 0 0 8px;
+      }
+      .vision-card p {
+        color: rgba(255,255,255,0.72);
+        font-size: 13.5px;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      /* Print */
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          background: #032D60 !important;
+        }
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        @page { size: letter; margin: 0; }
+        header { padding: 32px 36px 28px; }
+        h1 { font-size: 28px; }
+        header .subtitle { font-size: 13px; }
+        .header-eyebrow { font-size: 10px; margin-bottom: 8px; }
+        .header-meta { margin-top: 14px; }
+        .header-meta span { font-size: 11px; }
+        .container { padding: 24px 36px 36px; }
+        .stats-row { gap: 12px; margin-bottom: 20px; }
+        .stat-card { padding: 14px; }
+        .stat-card .number { font-size: 22px; }
+        .stat-card .label { font-size: 10px; }
+        .section { padding: 20px 24px; margin-bottom: 0; border-radius: 8px; }
+        .section h2 { font-size: 17px; margin-bottom: 14px; }
+        .section .lead { font-size: 12px; margin-bottom: 14px; }
+        .exec-box { padding: 14px 16px; }
+        .exec-box h3 { font-size: 10.5px; margin-bottom: 6px; }
+        .exec-box p { font-size: 12px; }
+        .challenge-card { padding: 16px 18px; }
+        .challenge-card h3 { font-size: 13px; }
+        .challenge-card p { font-size: 11.5px; }
+        .challenge-card .impact { font-size: 10px; margin-top: 8px; padding-top: 8px; }
+        .pdf-page-break { page-break-before: always; padding-top: 28px; }
+        .solution-block { padding: 16px 0; gap: 14px; }
+        .solution-content h3 { font-size: 14px; }
+        .solution-content .challenge-ref { font-size: 10px; }
+        .solution-content p { font-size: 12px; margin-bottom: 8px; }
+        .product-tag { font-size: 10px; padding: 3px 10px; }
+        .solution-number { width: 30px; height: 30px; min-width: 30px; font-size: 13px; }
+        .layer { padding: 12px 14px; grid-template-columns: 120px 1fr; gap: 12px; }
+        .layer .layer-tag { font-size: 9.5px; }
+        .layer .layer-name { font-size: 13px; }
+        .layer p { font-size: 11.5px; }
+        .compare > div { padding: 10px 12px; font-size: 11px; }
+        .compare .head { font-size: 11px; }
+        .phase-card { padding: 16px; }
+        .phase-card h3 { font-size: 14px; }
+        .phase-label { font-size: 9.5px; }
+        .phase-card .timeframe { font-size: 10px; margin-bottom: 8px; }
+        .phase-card li { font-size: 11px; margin-bottom: 4px; line-height: 1.35; }
+        .roadmap { gap: 10px; }
+        .outcome-card { padding: 14px; }
+        .outcome-card h3 { font-size: 13px; }
+        .outcome-card p { font-size: 11px; }
+        .outcome-card .outcome-icon { width: 32px; height: 32px; margin-bottom: 6px; }
+        .outcome-card .outcome-icon svg { width: 16px; height: 16px; }
+        .outcome-grid { gap: 12px; }
+        .case-study { gap: 14px; }
+        .case-side { padding: 14px 16px; }
+        .case-side .name { font-size: 18px; }
+        .case-side .desc { font-size: 11px; }
+        .case-side .metric { font-size: 22px; }
+        .case-side .metric-label { font-size: 10px; }
+        .case-body { padding: 14px 16px; }
+        .case-body h3 { font-size: 13px; }
+        .case-body p { font-size: 11.5px; }
+        .case-body .quote { font-size: 11.5px; padding: 2px 10px; margin: 10px 0; }
+        .case-body .attribution { font-size: 10px; }
+        .vision-card { padding: 14px 16px; }
+        .vision-card h3 { font-size: 12.5px; margin-bottom: 4px; }
+        .vision-card p { font-size: 10.5px; line-height: 1.45; }
+        .vision-grid { gap: 12px; }
+        .vision-icon svg { width: 22px !important; height: 22px !important; }
+        .challenge-card, .phase-card, .outcome-card, .vision-card, .solution-block, .layer { page-break-inside: avoid; }
+      }
+
+      @media (max-width: 1000px) {
+        .exec-summary, .challenge-grid, .outcome-grid, .vision-grid, .case-study { grid-template-columns: 1fr; }
+        .roadmap { grid-template-columns: repeat(2, 1fr); }
+        .compare { grid-template-columns: 1fr; }
+        .compare > div { border-right: none; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .container { padding: 24px 20px 48px; }
+        header { padding: 32px 20px; }
+        .layer { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- HEADER -->
+    <header>
+      <div class="header-eyebrow">Salesforce Point of View &middot; Security</div>
+      <h1>Securing the Agentic Enterprise</h1>
+      <p class="subtitle">As multi-agent systems move from prototype to production, the attack surface, compliance exposure, and operational risk all expand &mdash; faster than most security programs can adapt. MuleSoft Agent Fabric (MAF) is how Salesforce extends trust, governance, and observability across every agent, every tool, and every model in the enterprise.</p>
+      <div class="header-meta">
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          May 2026
+        </span>
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          MuleSoft Agent Fabric
+        </span>
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Synthesized from MAF enablement &mdash; April 10, 2026
+        </span>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- AT A GLANCE -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="number">4</div>
+          <div class="label">Pillars: Discover &middot; Orchestrate &middot; Govern &middot; Observe</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">2</div>
+          <div class="label">Open Standards Wrapped: MCP &amp; A2A</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">Zero</div>
+          <div class="label">Payload Stored by Default in Traces</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">$M+</div>
+          <div class="label">Avoided Compliance &amp; Contract-Breach Exposure</div>
+        </div>
+      </div>
+
+      <!-- EXECUTIVE SUMMARY -->
+      <div class="section">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Executive Summary
+        </h2>
+        <div class="exec-summary">
+          <div class="exec-box">
+            <h3>The Shift</h3>
+            <p>Every enterprise is building agents &mdash; inside Agentforce, but also inside Bedrock, Google ADK, LangChain, and bespoke open-source frameworks. Security and governance were not built in; they are being bolted on after the fact, agent by agent.</p>
+          </div>
+          <div class="exec-box">
+            <h3>The Risk</h3>
+            <p>Siloed agents, unsanctioned tool calls, PII leaking into third-party LLMs, runaway agent-to-agent loops, and zero shared audit trail. In the last quarter alone, the open-source agent ecosystem has produced a steady stream of disclosed vulnerabilities and prompt-injection compromises.</p>
+          </div>
+          <div class="exec-box full-width">
+            <h3>The Salesforce Position</h3>
+            <p>MAF is the control plane that sits <em>outside</em> the agent &mdash; not inside it. It discovers every agent in your estate, enforces policy as configuration (not code), brokers deterministic orchestration across protocols, and produces a unified trace of every action. It is the platform-level complement to the Einstein Trust Layer: where the Trust Layer secures what happens inside Agentforce, MAF secures what happens between Agentforce and everything else.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- THREAT LANDSCAPE -->
+      <div class="section">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          The Security Reality of Multi-Agent Ecosystems
+        </h2>
+        <p class="lead">Six interconnected risks emerge the moment an enterprise scales beyond a single, sanctioned agent. Each one is a compliance issue, a cost issue, and a brand issue at the same time.</p>
+        <div class="challenge-grid">
+
+          <div class="challenge-card">
+            <div class="ch-number">1</div>
+            <h3>
+              <span class="icon red"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              Agent Sprawl &amp; Unknown Tooling
+            </h3>
+            <p>Teams are spinning up agents in Bedrock, Google Cloud, GoDaddy, and inside experimental notebooks. Security has no inventory, no owner map, and no idea which agents are touching production data or which MCP servers they are reaching out to.</p>
+            <div class="impact">Impact: Unmanaged data exposure, audit failures</div>
+          </div>
+
+          <div class="challenge-card">
+            <div class="ch-number">2</div>
+            <h3>
+              <span class="icon red"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              PII Leakage to Third-Party LLMs
+            </h3>
+            <p>Many LLM contracts allow training on prompt content. The moment an unsanctioned agent passes an email, SSN, credit card, or phone number to that model, the data is effectively gone &mdash; and almost no agent today inspects its own outbound payload before sending it.</p>
+            <div class="impact">Impact: Contractual breach, regulatory penalties</div>
+          </div>
+
+          <div class="challenge-card">
+            <div class="ch-number">3</div>
+            <h3>
+              <span class="icon orange"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              Agent-to-Agent Loops &amp; Cost Runaway
+            </h3>
+            <p>Without a broker enforcing flow, agents call agents call agents &mdash; the contractor calls the architect calls the town. Loops emerge from wrong context as easily as from logic errors, and every iteration burns tokens against a corporate spend account no one is watching in real time.</p>
+            <div class="impact">Impact: Token spend explosions, SLO collapse</div>
+          </div>
+
+          <div class="challenge-card">
+            <div class="ch-number">4</div>
+            <h3>
+              <span class="icon red"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              Authorization Built Into the Wrong Layer
+            </h3>
+            <p>When auth is coded into each agent, you get inconsistent enforcement, no way to revoke quickly, and no defense against a compromised agent escalating privilege. Every agent becomes its own bespoke auth boundary &mdash; and every agent becomes its own bespoke attack surface.</p>
+            <div class="impact">Impact: Privilege creep, slow incident response</div>
+          </div>
+
+          <div class="challenge-card">
+            <div class="ch-number">5</div>
+            <h3>
+              <span class="icon orange"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              Protocol &amp; Vendor Lock-In
+            </h3>
+            <p>The agent stack you build today &mdash; MCP server X, A2A wrapper Y, model Z &mdash; will not be the stack you run in twelve months. Standards are moving monthly. Hard-coding agents to a single protocol or LLM creates rewrite risk every time the field shifts.</p>
+            <div class="impact">Impact: Rewrite cost, slow standards adoption</div>
+          </div>
+
+          <div class="challenge-card">
+            <div class="ch-number">6</div>
+            <h3>
+              <span class="icon red"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span>
+              No Unified Audit Trail
+            </h3>
+            <p>When something fails &mdash; or worse, succeeds the wrong way &mdash; there is no single trace that spans an Agentforce agent, a LangChain helper, a Google ADK agent, and an MCP service. Forensics becomes archaeology, and regulators are not patient archaeologists.</p>
+            <div class="impact">Impact: Failed audits, unbounded breach scope</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- HOW MAF ADDRESSES EACH RISK -->
+      <div class="section pdf-page-break">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          How MuleSoft Agent Fabric Closes Each Gap
+        </h2>
+        <p class="lead">MAF treats security as four cooperating capabilities &mdash; Discover, Orchestrate, Govern, Observe &mdash; applied <em>on top of</em> agents instead of inside them. The pattern matches twenty years of API security maturity: enforce at the gateway, not in the application.</p>
+
+        <div class="solution-block">
+          <div class="solution-number">1</div>
+          <div class="solution-content">
+            <h3>Agent Registry &amp; Continuous Scanners</h3>
+            <div class="challenge-ref">Resolves: Agent Sprawl &amp; Unknown Tooling</div>
+            <p>Exchange evolves into an Agent Registry that catalogs every agent and MCP service in the estate &mdash; whether built in Agentforce or imported from Bedrock, Google Cloud, GoDaddy, Azure, or anywhere else. Scanners run on a schedule and pull newly discovered agents in automatically, so security teams stop chasing inventory and start applying policy. Documentation is generated by Agentforce itself, removing the &ldquo;undocumented agent&rdquo; failure mode.</p>
+            <div class="product-tags">
+              <span class="product-tag">Agent Registry</span>
+              <span class="product-tag">Multi-Cloud Scanners</span>
+              <span class="product-tag">Auto-Generated Docs</span>
+              <span class="product-tag">A2A Agent Cards</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-block">
+          <div class="solution-number">2</div>
+          <div class="solution-content">
+            <h3>Inbound &amp; Outbound Policy Enforcement (PII Guardrails)</h3>
+            <div class="challenge-ref">Resolves: PII Leakage to Third-Party LLMs</div>
+            <p>Policy is added the same way a developer adds an API gateway policy &mdash; declaratively, on top of the agent. An A2A or MCP decorator policy can <em>reject</em> any payload containing email addresses, social security numbers, credit card numbers, or phone numbers before it ever reaches the underlying LLM. This is the complement to the Einstein Trust Layer&rsquo;s masking: Trust Layer masks inside Agentforce; MAF rejects (or transforms) outside it.</p>
+            <div class="product-tags">
+              <span class="product-tag">A2A Policies</span>
+              <span class="product-tag">MCP Policies</span>
+              <span class="product-tag">PII Reject &amp; Encode</span>
+              <span class="product-tag">Custom Policy SDK</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-block">
+          <div class="solution-number">3</div>
+          <div class="solution-content">
+            <h3>Deterministic Broker &amp; LLM Proxy</h3>
+            <div class="challenge-ref">Resolves: Agent Loops &amp; Cost Runaway</div>
+            <p>The broker decides &mdash; using LLM-driven intent resolution combined with declarative path definitions &mdash; which agents and tools execute, and in what order. Agents do not free-style call each other into infinite recursion. The LLM Proxy adds the missing fuse box: per-model token counts, context-window visibility, and configurable kill switches that throttle or shut off a model that goes rogue.</p>
+            <div class="product-tags">
+              <span class="product-tag">Agent Broker</span>
+              <span class="product-tag">LLM Proxy</span>
+              <span class="product-tag">Token &amp; Cost Controls</span>
+              <span class="product-tag">Circuit Breakers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-block">
+          <div class="solution-number">4</div>
+          <div class="solution-content">
+            <h3>Externalized Authorization (Step-Up Auth)</h3>
+            <div class="challenge-ref">Resolves: Authorization Built Into the Wrong Layer</div>
+            <p>The investment-recommendation demo shown in enablement made the pattern explicit: authorize once to <em>read</em> sensitive financial data, authorize again to <em>transact</em>. Auth is delegated to the corporate IdP and brokered by MAF &mdash; never re-implemented inside an agent. When privileges need to be revoked or scoped, it happens centrally, not in dozens of agent codebases.</p>
+            <div class="product-tags">
+              <span class="product-tag">Delegated Auth</span>
+              <span class="product-tag">SSO / OIDC</span>
+              <span class="product-tag">Step-Up Authentication</span>
+              <span class="product-tag">Human-in-the-Loop Escalation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-block">
+          <div class="solution-number">5</div>
+          <div class="solution-content">
+            <h3>Protocol Abstraction (MCP &amp; A2A Wrappers)</h3>
+            <div class="challenge-ref">Resolves: Protocol &amp; Vendor Lock-In</div>
+            <p>MAF ships native A2A and MCP connectors plus an MCP Bridge that auto-exposes existing Mule APIs as MCP endpoints. The agent itself does not care which protocol it speaks &mdash; MAF wraps it. When the field standardizes on the next protocol next quarter, the wrapper changes and the agent does not. Security policies follow the wrapper, not the protocol.</p>
+            <div class="product-tags">
+              <span class="product-tag">A2A Connector</span>
+              <span class="product-tag">MCP Connector</span>
+              <span class="product-tag">MCP Bridge</span>
+              <span class="product-tag">Operation Decorator</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-block">
+          <div class="solution-number">6</div>
+          <div class="solution-content">
+            <h3>End-to-End Tracing &amp; Visualizer</h3>
+            <div class="challenge-ref">Resolves: No Unified Audit Trail</div>
+            <p>Every hop &mdash; Agentforce agent, LangChain helper, Google ADK agent, MCP service &mdash; is captured in a single trace with session and context IDs. Status codes, latency, and token usage flow into the Visualizer; payloads are <em>not</em> stored unless explicitly logged, which makes the platform safe for regulated data by default. Forensics becomes a query, not an investigation.</p>
+            <div class="product-tags">
+              <span class="product-tag">Distributed Tracing</span>
+              <span class="product-tag">MAF Visualizer</span>
+              <span class="product-tag">Session &amp; Context IDs</span>
+              <span class="product-tag">Opt-In Payload Logging</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LAYERED DEFENSE -->
+      <div class="section">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Defense in Depth: How the Four Pillars Stack
+        </h2>
+        <p class="lead">No single control stops a determined adversary or a careless prompt. MAF layers controls so that a failure at one layer is caught at the next &mdash; the same pattern enterprise networks have used for decades, applied to agents.</p>
+        <div class="layers">
+          <div class="layer l1">
+            <div class="layer-label">
+              <span class="layer-tag">Layer 1 &middot; Discover</span>
+              <span class="layer-name">Inventory &amp; Identity</span>
+            </div>
+            <p>You cannot govern what you cannot see. The Agent Registry, multi-cloud scanners, and A2A agent cards establish a complete inventory of agents, their owners, their skills, and their declared data scopes.</p>
+          </div>
+          <div class="layer l2">
+            <div class="layer-label">
+              <span class="layer-tag">Layer 2 &middot; Orchestrate</span>
+              <span class="layer-name">Deterministic Flow Control</span>
+            </div>
+            <p>The broker defines which agents and tools may run, in what sequence, and under what conditions. Non-deterministic intent resolution is bounded by deterministic execution paths &mdash; the AI decides what, the platform decides how.</p>
+          </div>
+          <div class="layer l3">
+            <div class="layer-label">
+              <span class="layer-tag">Layer 3 &middot; Govern</span>
+              <span class="layer-name">Policy at the Gateway</span>
+            </div>
+            <p>A2A and MCP policies enforce PII rejection, client ID enforcement, operation renaming, and custom guardrails. The LLM Proxy adds rate limits, token ceilings, and kill switches per model. Policies are configuration, not code &mdash; deployed centrally, applied everywhere.</p>
+          </div>
+          <div class="layer l4">
+            <div class="layer-label">
+              <span class="layer-tag">Layer 4 &middot; Observe</span>
+              <span class="layer-name">Continuous Telemetry</span>
+            </div>
+            <p>Unified tracing across every agent and MCP service feeds the Visualizer in real time. Anomalies in latency, token consumption, or call patterns surface immediately &mdash; without storing the payloads that would expand breach scope.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAF + TRUST LAYER -->
+      <div class="section pdf-page-break">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          MAF + Einstein Trust Layer: Complementary, Not Competing
+        </h2>
+        <p class="lead">A common question is whether MAF overlaps the Einstein Trust Layer. It does not. The Trust Layer secures generative interactions inside Agentforce; MAF secures the orchestration, governance, and observability of every agent and tool outside it. The two together cover the full surface.</p>
+        <div class="compare">
+          <div class="head">Dimension</div>
+          <div class="head">Einstein Trust Layer</div>
+          <div class="head">MuleSoft Agent Fabric</div>
+
+          <div class="dim">Primary scope</div>
+          <div>Generative AI calls inside Agentforce / Salesforce platform</div>
+          <div>All agents and MCP services across the enterprise (Salesforce + non-Salesforce)</div>
+
+          <div class="dim">PII handling</div>
+          <div>Dynamic masking and zero-data-retention with foundation models</div>
+          <div>Policy-driven rejection, encoding, or transformation at the A2A / MCP gateway</div>
+
+          <div class="dim">Authorization</div>
+          <div>Salesforce object &amp; field permissions, sharing model</div>
+          <div>Delegated auth, step-up flows, and revocation across heterogeneous agents</div>
+
+          <div class="dim">Audit trail</div>
+          <div>Audit of generative prompts and responses within Agentforce</div>
+          <div>Distributed trace spanning every agent, broker hop, and tool call</div>
+
+          <div class="dim">Cost &amp; abuse controls</div>
+          <div>Agentforce-scoped usage governance</div>
+          <div>LLM Proxy with per-model token ceilings, throttles, and kill switches</div>
+
+          <div class="dim">Best when</div>
+          <div>The agent and the data live inside Salesforce</div>
+          <div>Process spans Salesforce <em>and</em> external systems, agents, or models</div>
+        </div>
+      </div>
+
+      <!-- PHASED PATH -->
+      <div class="section pdf-page-break">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          A Phased Path to Secure Agentic Operations
+        </h2>
+        <p class="lead">Treat agentic security the same way you treat zero-trust network rollout: inventory first, enforce next, then observe at scale. Each phase delivers standalone value &mdash; you do not have to deploy all four pillars to gain protection.</p>
+        <div class="roadmap">
+          <div class="phase-card">
+            <div class="phase-label">Phase 1 &middot; Discover</div>
+            <h3>Establish the Inventory</h3>
+            <div class="timeframe">Weeks 1&ndash;4</div>
+            <ul>
+              <li>Stand up the Agent Registry and connect Exchange</li>
+              <li>Deploy scanners against Bedrock, Google ADK, Azure, and any home-grown frameworks</li>
+              <li>Capture A2A agent cards, owners, and declared data scopes</li>
+              <li>Auto-generate documentation per agent</li>
+              <li>Publish the &ldquo;sanctioned agents&rdquo; catalog to security and compliance</li>
+            </ul>
+          </div>
+          <div class="phase-card">
+            <div class="phase-label">Phase 2 &middot; Govern</div>
+            <h3>Apply Policy at the Edge</h3>
+            <div class="timeframe">Weeks 5&ndash;10</div>
+            <ul>
+              <li>Apply A2A and MCP PII reject policies on regulated agents first</li>
+              <li>Roll out client ID enforcement and operation-renaming decorators</li>
+              <li>Deploy the LLM Proxy with token ceilings and kill switches</li>
+              <li>Wire delegated auth and step-up flows for sensitive actions</li>
+              <li>Establish exception, override, and approval workflows</li>
+            </ul>
+          </div>
+          <div class="phase-card">
+            <div class="phase-label">Phase 3 &middot; Orchestrate</div>
+            <h3>Broker the Flow</h3>
+            <div class="timeframe">Weeks 11&ndash;18</div>
+            <ul>
+              <li>Migrate high-value cross-system processes onto the MAF broker</li>
+              <li>Replace ad-hoc agent-to-agent calls with brokered orchestration</li>
+              <li>Use Agent Script &amp; vibe-coded brokers for fast iteration</li>
+              <li>Add human-in-the-loop checkpoints for high-risk transactions</li>
+              <li>Define swap-in / swap-out playbooks for model and protocol changes</li>
+            </ul>
+          </div>
+          <div class="phase-card">
+            <div class="phase-label">Phase 4 &middot; Observe</div>
+            <h3>Operationalize Telemetry</h3>
+            <div class="timeframe">Weeks 19+</div>
+            <ul>
+              <li>Stream MAF traces into the corporate SIEM</li>
+              <li>Build dashboards for token spend, latency outliers, and policy violations</li>
+              <li>Tune anomaly detection on agent call patterns and context drift</li>
+              <li>Run quarterly red-team exercises against the agent estate</li>
+              <li>Feed observability findings back into governance policies</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE STUDY -->
+      <div class="section">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Customer Proof: D&rsquo;absolute
+        </h2>
+        <p class="lead">D&rsquo;absolute is a Salesforce SI partner that was already running five-to-six agents across SharePoint, Azure AI Foundry, GitHub, and Claude. They had velocity. They did not have governance &mdash; and that is what closed the deal.</p>
+        <div class="case-study">
+          <div class="case-side">
+            <div class="badge">Customer Proof Point</div>
+            <div class="name">D&rsquo;absolute</div>
+            <div class="desc">Salesforce SI partner using MAF to govern a multi-agent estate spanning SharePoint, Azure AI Foundry, GitHub, and Claude.</div>
+            <div class="metric">18 mo &rarr; 4&ndash;6 mo</div>
+            <div class="metric-label">Anticipated Agentic Transformation Timeline</div>
+          </div>
+          <div class="case-body">
+            <h3>What MAF Changed</h3>
+            <p>Before MAF, every D&rsquo;absolute agent was siloed. There was no consistent way for them to talk to each other, no way to restrict PII flowing into Claude, and no audit trail when something went wrong. The first three agentic workflows under MAF were transformed in two-and-a-half weeks; the team now projects the full eighteen-month roadmap will compress to four-to-six months.</p>
+            <div class="quote">
+              &ldquo;Compliance is way ahead of things. If due to some reason I lose my contract&hellip; that&rsquo;s a contract breach for me &mdash; it could cost me millions or even lawsuits. That&rsquo;s one of the most important features of MAF.&rdquo;
+              <div class="attribution">&mdash; Abhishek Deb, Lead Solution Engineer, MuleSoft (recounting the deciding factor for D&rsquo;absolute)</div>
+            </div>
+            <p>The pattern matters beyond one customer: compliance, contract enforcement, and unified governance are what turn an agentic experiment into an agentic enterprise. D&rsquo;absolute has since presented the architecture to another SI partner, Assemble, which signed the next day.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTCOMES -->
+      <div class="section pdf-page-break">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          What &ldquo;Secure by Default&rdquo; Looks Like
+        </h2>
+        <div class="outcome-grid">
+          <div class="outcome-card">
+            <div class="outcome-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3>One Inventory, Zero Surprises</h3>
+            <p>Every agent &mdash; sanctioned or not &mdash; is catalogued. Agent sprawl disappears, and policy enforcement starts with a complete picture instead of a partial one.</p>
+          </div>
+          <div class="outcome-card">
+            <div class="outcome-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.5 0 4.76 1 6.4 2.6"/></svg>
+            </div>
+            <h3>PII Stays Where It Belongs</h3>
+            <p>Outbound payloads are inspected at the gateway. Email, SSN, credit card, and phone-number patterns are rejected before they ever reach a third-party LLM &mdash; with no agent-side code changes.</p>
+          </div>
+          <div class="outcome-card">
+            <div class="outcome-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <h3>Cost &amp; Behavior Stay Bounded</h3>
+            <p>Token ceilings, model kill switches, and brokered flow prevent the agent-to-agent loops that quietly drain budgets. When something deviates, it is throttled in milliseconds, not in next month&rsquo;s invoice.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FUTURE STATE -->
+      <div class="section" style="margin-top: 0;">
+        <h2>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          The Future State: A Trusted Agentic Enterprise
+        </h2>
+        <p style="color: rgba(255,255,255,0.7); font-size: 14.5px; margin: 0 0 24px; line-height: 1.7;">With MAF in place, the agentic enterprise stops being a collection of experiments and becomes a governed operating model. Security is no longer the team that says no &mdash; it becomes the team that publishes the standard that everyone else builds against.</p>
+        <div class="vision-grid">
+          <div class="vision-card">
+            <div class="vision-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3>Policy as the Product</h3>
+            <p>Security publishes versioned, declarative policies &mdash; PII rejection profiles, token budgets, auth flows &mdash; the same way platform teams publish APIs. Every new agent inherits the corporate baseline on day one without touching agent code.</p>
+          </div>
+          <div class="vision-card">
+            <div class="vision-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3>Forensics in Minutes, Not Days</h3>
+            <p>Unified tracing means the question &ldquo;what did this agent do at 3:47 a.m. with this customer&rsquo;s data?&rdquo; has a single answer in a single place &mdash; spanning Agentforce, third-party agents, MCP services, and downstream APIs.</p>
+          </div>
+          <div class="vision-card">
+            <div class="vision-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <h3>Standards Move Without You Moving</h3>
+            <p>When the agent protocol of next quarter replaces today&rsquo;s, the wrapper changes and nothing else has to. The enterprise adopts the new standard at the speed of configuration &mdash; not at the speed of a six-month rewrite.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
