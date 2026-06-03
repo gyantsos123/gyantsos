@@ -442,7 +442,7 @@
             </div>
             <div class="surface-card l2">
                 <h4><span class="surface-badge l2">L2</span> Cursor / sf-cli</h4>
-                <p>External IDE using Salesforce CLI. Direct REST calls via OAuth session token.</p>
+                <p>External IDE using Salesforce CLI. <code>Client</code> shows as <code>sfdx-toolbelt</code> (generic). Requires Connected App for ApiEvent.</p>
             </div>
             <div class="surface-card l3">
                 <h4><span class="surface-badge l3">L3</span> Custom App (Direct REST)</h4>
@@ -485,14 +485,14 @@
                         </td>
                         <td>
                             <div class="status-cell">
-                                <span class="status-icon green">✓</span>
-                                <span class="status-text">Full visibility</span>
+                                <span class="status-icon yellow">⚠</span>
+                                <span class="status-text">CA only* + <code>ConnectedAppId</code></span>
                             </div>
                         </td>
                         <td>
                             <div class="status-cell">
                                 <span class="status-icon yellow">⚠</span>
-                                <span class="status-text">Connected App only*</span>
+                                <span class="status-text">CA only* + <code>ConnectedAppId</code></span>
                             </div>
                         </td>
                         <td>
@@ -549,8 +549,8 @@
                         </td>
                         <td>
                             <div class="status-cell">
-                                <span class="status-icon green">✓</span>
-                                <span class="status-text">Scope by <code>Client</code></span>
+                                <span class="status-icon yellow">⚠</span>
+                                <span class="status-text">Connected App only*</span>
                             </div>
                         </td>
                         <td>
@@ -726,7 +726,8 @@
                     <li>TSPs require an <code>ApiEvent</code> or <code>LoginEvent</code> to fire — no event, no enforcement</li>
                     <li>For MCP-routed apps (L4), <strong>LoginEvent TSP is the only real-time lever</strong> — use gateway IP filtering as a binary kill switch</li>
                     <li>Agentforce (L1) supports <strong>agent-scoped policies</strong> using <code>BotId</code> field</li>
-                    <li>Cursor/CLI (L2) can be scoped using <code>Client.containsIgnoreCase('sfdx')</code></li>
+                    <li>CLI tools show <code>Client</code> as <code>sfdx-toolbelt</code> (generic, not app-specific) — scope with <code>Client.containsIgnoreCase('sfdx')</code></li>
+                    <li><code>ConnectedAppId</code> field is only populated with Connected App auth — use it to identify specific apps</li>
                 </ul>
             </div>
             <div class="info-card">
@@ -742,9 +743,11 @@
         </div>
 
         <div class="footnote">
-            <p><strong>* L3 Conditional Visibility:</strong> Direct REST apps have different visibility depending on authentication method:</p>
-            <p>• <strong>Connected App (session token)</strong> → Full <code>ApiEvent</code> visibility, TSPs fire normally</p>
-            <p>• <strong>External Client App (ECA JWT)</strong> → Zero <code>ApiEvent</code> records, TSPs cannot enforce — same blind spot as MCP</p>
+            <p><strong>* Conditional Visibility (L2, L3):</strong> Real-time ApiEvent visibility depends entirely on <strong>authentication method</strong>, not the tool or surface:</p>
+            <p>• <strong>Connected App (session token)</strong> → Full <code>ApiEvent</code> visibility + <code>ConnectedAppId</code> populated, TSPs fire normally</p>
+            <p>• <strong>External Client App (ECA JWT)</strong> → Zero <code>ApiEvent</code> records, no <code>ConnectedAppId</code>, TSPs cannot enforce — same blind spot as MCP</p>
+            <p style="margin-top: 12px;"><strong>Client field:</strong> The <code>Client</code> field shows generic values like <code>sfdx-toolbelt</code> for CLI tools — it identifies the tool type, not the specific application. To identify specific apps, use <code>ConnectedAppId</code> (only available with Connected App auth).</p>
+            <p style="margin-top: 12px;"><strong>sf-cli default:</strong> The Salesforce CLI uses Connected App authentication by default, so L2 typically has full visibility. However, if configured to use ECA JWT, it would lose real-time ApiEvent coverage.</p>
             <p style="margin-top: 12px;"><strong>Key Insight:</strong> ECA is Salesforce's recommended auth pattern for AI/MCP integrations, but it trades real-time Shield visibility for improved security architecture. Customers making the ECA choice should understand this trade-off.</p>
         </div>
     </div>
