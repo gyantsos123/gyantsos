@@ -1,0 +1,3028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Governance Gradient — Four Experiments in Agent Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --blue-900: #032D60;
+            --blue-700: #0B5CAB;
+            --blue-600: #0176D3;
+            --blue-500: #1B96FF;
+            --blue-400: #57A3FD;
+            --blue-100: #E5F2FF;
+            --blue-50: #F3F8FF;
+            --white: #FFFFFF;
+            --gray-900: #1A1A1A;
+            --gray-700: #444444;
+            --gray-500: #6B7280;
+            --gray-300: #D1D5DB;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --amber-50: #FFF8E1;
+            --amber-600: #C77700;
+            --green-50: #ECFDF5;
+            --green-600: #047857;
+            --red-50: #FEF2F2;
+            --red-600: #DC2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-700);
+            line-height: 1.7;
+            background-color: var(--blue-50);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 50%, var(--blue-600) 100%);
+        }
+
+        .content-wrapper { position: relative; z-index: 1; }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(3, 45, 96, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(87, 163, 253, 0.3);
+            z-index: 1000;
+            padding: 0 24px;
+        }
+
+        .nav-container {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 70px;
+        }
+
+        .nav-logo {
+            color: var(--blue-400);
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-decoration: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-logo span { color: var(--white); }
+
+        .hero-brand-logo {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-brand-logo img {
+            height: 48px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex; gap: 16px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: linear-gradient(180deg, var(--blue-600) 0%, var(--blue-700) 100%);
+            border-color: var(--blue-500);
+            box-shadow: 0 4px 0 var(--blue-900), 0 6px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-cta {
+            background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%) !important;
+            box-shadow: 0 4px 0 var(--blue-900), 0 6px 15px rgba(1,118,211,0.4), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+            border-color: var(--blue-400) !important;
+        }
+
+        .nav-cta:hover {
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--blue-900), 0 8px 20px rgba(1,118,211,0.5), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 150px 24px 100px;
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-container {
+            max-width: 1100px; margin: 0 auto;
+            position: relative; z-index: 1;
+            color: var(--white);
+        }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 span { color: var(--blue-400); }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 800px;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%);
+            color: var(--white);
+            box-shadow: 0 6px 0 var(--blue-900), 0 8px 20px rgba(3,45,96,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--blue-900), 0 12px 30px rgba(3,45,96,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--blue-900), 0 4px 10px rgba(3,45,96,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+            color: var(--white);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 0 rgba(3,45,96,0.6), 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.15) 100%);
+            border-color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 rgba(3,45,96,0.6), 0 12px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(3,45,96,0.6), 0 4px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        /* Hero stats strip */
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 900px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .hero-stat .num {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--blue-400);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .hero-stat .label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Sections */
+        section { padding: 90px 24px; position: relative; }
+        .section-container { max-width: 1100px; margin: 0 auto; }
+        .section-light { background: rgba(255, 255, 255, 0.97); }
+        .section-gray { background: rgba(243, 244, 246, 0.97); }
+        .section-featured {
+            background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+            color: var(--white);
+        }
+
+        .section-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-500) 100%);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(1, 118, 211, 0.25);
+        }
+
+        .section-featured .section-icon {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        .section-featured .section-title { color: var(--white); }
+
+        .section-lede {
+            font-size: 1.15rem;
+            color: var(--gray-700);
+            margin-bottom: 36px;
+            max-width: 800px;
+        }
+
+        .section-featured .section-lede { color: rgba(255, 255, 255, 0.9); }
+
+        /* Quote box */
+        .quote-box {
+            background: linear-gradient(135deg, var(--blue-50) 0%, var(--white) 100%);
+            border-left: 4px solid var(--blue-600);
+            border-radius: 0 16px 16px 0;
+            padding: 24px 28px;
+            margin: 28px 0;
+            font-size: 1.05rem;
+            color: var(--blue-900);
+            font-weight: 500;
+        }
+
+        .quote-box .attribution {
+            display: block;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--blue-700);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-featured .quote-box {
+            background: rgba(255, 255, 255, 0.08);
+            border-left-color: var(--blue-400);
+            color: var(--white);
+        }
+
+        .section-featured .quote-box .attribution { color: var(--blue-400); }
+
+        /* Layer cards (the 4 surfaces) */
+        .layer-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
+        .layer-card {
+            background: linear-gradient(180deg, #FFFFFF 0%, #FBFCFE 55%, #F3F6FB 100%);
+            border: 1px solid #DDE5F0;
+            border-top-color: #FFFFFF;
+            border-bottom-color: #C9D4E4;
+            border-left: 6px solid var(--blue-600);
+            border-radius: 16px;
+            padding: 24px 28px;
+            display: grid;
+            grid-template-columns: 80px 1fr 2fr;
+            gap: 20px;
+            align-items: center;
+            position: relative;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 1),
+                inset 0 -1px 0 rgba(15, 35, 75, 0.06),
+                inset 0 -10px 22px -14px rgba(15, 35, 75, 0.12),
+                0 1px 0 rgba(255, 255, 255, 0.9),
+                0 10px 22px -10px rgba(3, 45, 96, 0.18),
+                0 22px 40px -22px rgba(3, 45, 96, 0.18);
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        }
+
+        .layer-card::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+            margin-left: -6px;
+            border-radius: 16px 0 0 16px;
+            background: linear-gradient(180deg, #1B96FF 0%, #0176D3 50%, #032D60 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+                2px 0 6px -3px rgba(3, 45, 96, 0.4);
+            pointer-events: none;
+            transition: box-shadow 220ms ease;
+        }
+
+        .layer-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(27, 150, 255, 0.55);
+            border-top-color: #FFFFFF;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 1),
+                inset 0 -1px 0 rgba(15, 35, 75, 0.08),
+                inset 0 -12px 26px -16px rgba(15, 35, 75, 0.14),
+                0 0 0 4px rgba(27, 150, 255, 0.12),
+                0 0 28px rgba(27, 150, 255, 0.45),
+                0 18px 36px -14px rgba(3, 45, 96, 0.28),
+                0 36px 64px -26px rgba(3, 45, 96, 0.28);
+        }
+
+        .layer-card.is-warning { border-left-color: var(--amber-600); }
+        .layer-card.is-warning::before {
+            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 50%, #B45309 100%);
+        }
+
+        .layer-card > * { position: relative; z-index: 1; }
+
+        .surface-icon-tile {
+            width: 72px; height: 72px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, #F3F8FF 0%, #E5F2FF 100%);
+            border: 1px solid #DDE5F0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,1), 0 4px 10px -4px rgba(3,45,96,0.15);
+        }
+
+        .surface-icon-tile svg { width: 48px; height: 48px; display: block; }
+
+        .layer-name {
+            font-size: 1.2rem;
+            color: var(--gray-900);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .layer-sub {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        .layer-components {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            border: 1px solid var(--blue-100);
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .pill i { font-size: 0.7rem; opacity: 0.7; }
+        .pill.pill-warn {
+            background: var(--amber-50);
+            color: var(--amber-600);
+            border-color: #FDE68A;
+        }
+        .pill.pill-success {
+            background: var(--green-50);
+            color: var(--green-600);
+            border-color: #A7F3D0;
+        }
+        .pill.pill-danger {
+            background: var(--red-50);
+            color: var(--red-600);
+            border-color: #FECACA;
+        }
+
+        /* Interactive Stepper */
+        .stepper {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0;
+            margin: 40px 0 48px;
+            padding: 0 8px;
+        }
+
+        .stepper-track, .stepper-fill {
+            position: absolute;
+            top: 28px;
+            left: 8%; right: 8%;
+            height: 3px;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .stepper-track { background: rgba(255, 255, 255, 0.18); }
+
+        .stepper-fill {
+            background: linear-gradient(90deg, var(--blue-400) 0%, var(--blue-500) 100%);
+            width: 0;
+            transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(87, 163, 253, 0.5);
+        }
+
+        .stepper-btn {
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.2s;
+            z-index: 1;
+        }
+
+        .stepper-btn:hover { color: var(--white); }
+
+        .stepper-circle {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .stepper-btn:hover .stepper-circle {
+            border-color: var(--blue-400);
+            color: var(--white);
+            transform: scale(1.05);
+        }
+
+        .stepper-btn.is-done .stepper-circle {
+            background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%);
+            border-color: var(--blue-400);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(1, 118, 211, 0.4);
+        }
+
+        .stepper-btn.is-done .stepper-circle::before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 0.95rem;
+        }
+
+        .stepper-btn.is-done .stepper-num { display: none; }
+
+        .stepper-btn.is-active .stepper-circle {
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%);
+            border-color: var(--white);
+            color: var(--white);
+            transform: scale(1.15);
+            box-shadow: 0 0 0 6px rgba(87, 163, 253, 0.2), 0 8px 24px rgba(1, 118, 211, 0.5);
+        }
+
+        .stepper-btn.is-active { color: var(--white); }
+
+        .stepper-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+            max-width: 130px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 4-step stepper variant for per-surface sections */
+        .stepper-4 { grid-template-columns: repeat(4, 1fr); }
+        .stepper-4 .stepper-track, .stepper-4 .stepper-fill { left: 12%; right: 12%; }
+
+        /* Demo card styling */
+        .flow-slide.is-demo {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+            margin-bottom: 16px;
+        }
+
+        .demo-badge i { font-size: 1.1rem; }
+
+        .demo-observations {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .demo-observation {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+
+        .demo-observation i {
+            color: #10b981;
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .demo-observation.is-warning i { color: #f59e0b; }
+        .demo-observation.is-danger i { color: #ef4444; }
+
+        /* Slide deck */
+        .flow-deck { position: relative; min-height: 380px; }
+
+        .flow-slide {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px 44px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(16px);
+            visibility: hidden;
+            transition: opacity 0.45s ease, transform 0.45s ease, visibility 0s linear 0.45s;
+        }
+
+        .flow-slide.is-active {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+            transition: opacity 0.45s ease, transform 0.45s ease, visibility 0s;
+            position: relative;
+        }
+
+        .flow-slide-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .flow-slide-eyebrow {
+            display: inline-flex; align-items: center; gap: 10px;
+            color: var(--blue-400);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .flow-slide-eyebrow .step-pill {
+            background: rgba(87, 163, 253, 0.18);
+            border: 1px solid rgba(87, 163, 253, 0.35);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 0.72rem;
+            color: var(--white);
+        }
+
+        .flow-slide-counter {
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .flow-slide h3 {
+            color: var(--white);
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+        }
+
+        .flow-slide-body {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            max-width: 760px;
+        }
+
+        .flow-slide-artifacts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .flow-slide-artifact {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .flow-slide-artifact::before {
+            content: "›";
+            color: var(--blue-400);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Controls */
+        .flow-controls {
+            display: flex; justify-content: center; align-items: center;
+            gap: 14px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .flow-ctrl-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .flow-ctrl-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--blue-400);
+            transform: translateY(-1px);
+        }
+
+        .flow-ctrl-btn:active:not(:disabled) { transform: translateY(1px); }
+
+        .flow-ctrl-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .flow-ctrl-btn.is-primary {
+            background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%);
+            border-color: var(--blue-400);
+            box-shadow: 0 4px 0 var(--blue-900), 0 6px 14px rgba(1,118,211,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .flow-ctrl-btn.is-primary:hover:not(:disabled) {
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%);
+            box-shadow: 0 6px 0 var(--blue-900), 0 8px 18px rgba(1,118,211,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+
+        .flow-counter-display {
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+            min-width: 110px;
+            text-align: center;
+            padding: 0 6px;
+        }
+
+        .flow-hint {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.3px;
+        }
+
+        .flow-hint kbd {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            margin: 0 2px;
+            color: var(--white);
+        }
+
+        /* Comparison tables */
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-top: 24px;
+        }
+
+        .compare-table thead th {
+            background: var(--blue-50);
+            color: var(--blue-900);
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--blue-100);
+            vertical-align: bottom;
+        }
+
+        .compare-table thead th .col-icon {
+            width: 22px; height: 22px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .compare-table tbody td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            font-size: 0.95rem;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        .compare-table tbody tr:last-child td { border-bottom: none; }
+        .compare-table tbody tr:hover { background: var(--blue-50); }
+        .compare-table tbody td:first-child {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .compare-table tbody tr.row-warn { background: rgba(245, 158, 11, 0.07); }
+        .compare-table tbody tr.row-warn:hover { background: rgba(245, 158, 11, 0.12); }
+
+        .compare-table .status-cell {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-cell .status-icon {
+            width: 18px; height: 18px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        .status-cell.is-yes .status-icon { background: var(--green-600); }
+        .status-cell.is-no  .status-icon { background: var(--red-600); }
+        .status-cell.is-warn .status-icon { background: var(--amber-600); }
+        .status-cell.is-yes { color: var(--green-600); }
+        .status-cell.is-no  { color: var(--red-600); }
+        .status-cell.is-warn { color: var(--amber-600); }
+
+        .status-cell .note {
+            color: var(--gray-700);
+            font-weight: 400;
+            font-size: 0.85rem;
+            margin-left: 4px;
+        }
+
+        /* Two-column deep dive */
+        .deep-dive-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .deep-dive-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .deep-dive-card h3 {
+            color: var(--gray-900);
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .deep-dive-card h3 svg { width: 32px; height: 32px; flex-shrink: 0; }
+
+        .deep-dive-card .sub {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .deep-dive-card ul { list-style: none; margin-top: 16px; }
+
+        .deep-dive-card ul li {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        .deep-dive-card ul li:last-child { border-bottom: none; }
+
+        .deep-dive-card ul li i {
+            color: var(--blue-600);
+            font-size: 0.85rem;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .deep-dive-card ul li strong { color: var(--gray-900); }
+
+        /* Code block */
+        .code-block {
+            background: var(--blue-900);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 22px 26px;
+            margin: 20px 0;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.86rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+            position: relative;
+        }
+
+        .code-block .c-key { color: var(--blue-400); }
+        .code-block .c-str { color: #86efac; }
+        .code-block .c-com { color: #94a3b8; font-style: italic; }
+        .code-block .c-tag { color: #f9a8d4; }
+        .code-block .c-num { color: #fbbf24; }
+        .code-block .c-fn  { color: #a5f3fc; }
+
+        .code-block-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--blue-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Callouts */
+        .callout {
+            display: flex; gap: 16px;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin: 24px 0;
+            font-size: 0.98rem;
+        }
+
+        .callout i {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .callout strong { display: block; margin-bottom: 4px; font-size: 1rem; }
+
+        .callout-warn {
+            background: var(--amber-50);
+            border-left: 4px solid var(--amber-600);
+            color: #78350F;
+        }
+        .callout-warn i { color: var(--amber-600); }
+
+        .callout-info {
+            background: var(--blue-50);
+            border-left: 4px solid var(--blue-600);
+            color: var(--blue-900);
+        }
+        .callout-info i { color: var(--blue-600); }
+
+        .callout-success {
+            background: var(--green-50);
+            border-left: 4px solid var(--green-600);
+            color: #064E3B;
+        }
+        .callout-success i { color: var(--green-600); }
+
+        .callout-danger {
+            background: var(--red-50);
+            border-left: 4px solid var(--red-600);
+            color: #7F1D1D;
+        }
+        .callout-danger i { color: var(--red-600); }
+
+        /* Pipeline cards (the "where attribution breaks" pipeline) */
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-top: 36px;
+        }
+
+        .pipeline-stage {
+            background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(8,32,70,0.35) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-top-color: rgba(255, 255, 255, 0.45);
+            border-bottom-color: rgba(0, 0, 0, 0.35);
+            border-radius: 16px;
+            padding: 22px 16px 24px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: relative;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+                inset 0 -8px 18px -10px rgba(0, 0, 0, 0.55),
+                0 14px 28px -14px rgba(0, 0, 0, 0.55),
+                0 26px 48px -24px rgba(0, 0, 0, 0.45);
+            transition: transform 220ms ease, box-shadow 220ms ease;
+        }
+
+        .pipeline-stage:hover {
+            transform: translateY(-4px);
+            border-color: rgba(87, 163, 253, 0.7);
+        }
+
+        .pipeline-stage.is-broken {
+            border-color: rgba(220, 38, 38, 0.55);
+            background: linear-gradient(180deg, rgba(255,180,180,0.18) 0%, rgba(255,255,255,0.04) 45%, rgba(60,15,15,0.45) 100%);
+        }
+
+        .pipeline-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px;
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-600) 100%);
+            color: var(--white);
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 10px -2px rgba(0,0,0,0.4);
+        }
+
+        .pipeline-stage.is-broken .pipeline-num {
+            background: linear-gradient(180deg, #FCA5A5 0%, #DC2626 100%);
+        }
+
+        .pipeline-stage h5 {
+            color: var(--white);
+            font-size: 0.98rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .pipeline-stage p {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        /* Controls grid (compensating controls cards) */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .control-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-top: 4px solid var(--blue-600);
+            border-radius: 14px;
+            padding: 22px 24px;
+            transition: all 0.2s;
+        }
+
+        .control-card:hover {
+            border-color: var(--blue-400);
+            box-shadow: 0 12px 28px -10px rgba(1, 118, 211, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .control-card .control-num {
+            display: inline-block;
+            width: 32px; height: 32px;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            border-radius: 10px;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .control-card h5 {
+            color: var(--gray-900);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .control-card p {
+            font-size: 0.92rem;
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+
+        .control-card .control-effort {
+            margin-top: 12px;
+            font-size: 0.78rem;
+            color: var(--blue-700);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        /* Discussion prompts */
+        .prompt-list { margin-top: 32px; display: grid; gap: 14px; }
+
+        .prompt-item {
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 18px;
+            align-items: flex-start;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            padding: 20px 24px;
+            transition: all 0.2s;
+        }
+
+        .prompt-item:hover {
+            border-color: var(--blue-400);
+            box-shadow: 0 8px 24px rgba(1, 118, 211, 0.08);
+        }
+
+        .prompt-num {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-500) 100%);
+            color: var(--white);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 12px rgba(1, 118, 211, 0.25);
+        }
+
+        .prompt-text {
+            color: var(--gray-900);
+            font-size: 1.02rem;
+            line-height: 1.6;
+            font-weight: 500;
+            padding-top: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--blue-900);
+            color: var(--white);
+            padding: 50px 24px 30px;
+        }
+
+        .footer-container { max-width: 1100px; margin: 0 auto; }
+
+        .footer-top {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-brand h4 { font-size: 1.25rem; margin-bottom: 4px; }
+        .footer-brand p { color: var(--blue-100); font-size: 0.9rem; }
+
+        .footer-cta {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 12px 22px;
+            background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%);
+            border: 1px solid var(--blue-400);
+            color: var(--white);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .footer-cta:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%);
+        }
+
+        .footer-bottom {
+            padding-top: 24px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--blue-100);
+        }
+
+        /* Mobile menu */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column; justify-content: center; gap: 5px;
+            width: 36px; height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-menu-btn span {
+            display: block; width: 100%; height: 2px;
+            background: var(--white);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .mobile-menu-btn.active span:nth-child(2) { opacity: 0; }
+        .mobile-menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .mobile-menu {
+            display: none;
+            position: fixed; top: 70px; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 45, 96, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 999;
+            padding: 40px 24px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.active { opacity: 1; transform: translateY(0); }
+        .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .mobile-menu a {
+            display: block;
+            color: var(--white);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .nav-links { gap: 8px; }
+            .nav-links a { padding: 8px 12px; font-size: 0.85rem; }
+            .deep-dive-grid { grid-template-columns: 1fr; }
+            .pipeline { grid-template-columns: repeat(3, 1fr); }
+            .controls-grid { grid-template-columns: 1fr; }
+            .layer-card { grid-template-columns: 72px 1fr; }
+            .layer-components { grid-column: 1 / -1; margin-top: 8px; }
+            .stepper-label { display: none; }
+            .stepper-circle { width: 48px; height: 48px; font-size: 1rem; }
+            .stepper-track, .stepper-fill { top: 24px; }
+            .flow-slide { padding: 28px; }
+            .flow-slide h3 { font-size: 1.4rem; }
+            .flow-slide-artifacts { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .mobile-menu { display: block; pointer-events: none; }
+            .mobile-menu.active { pointer-events: auto; }
+            .hero { padding: 130px 24px 60px; min-height: auto; }
+            .hero h1 { font-size: 2.1rem; }
+            .hero-description { font-size: 1rem; }
+            .hero-buttons { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .hero-stats { grid-template-columns: repeat(2, 1fr); }
+            .section-title { font-size: 1.6rem; }
+            .pipeline { grid-template-columns: repeat(2, 1fr); }
+            .stepper { gap: 4px; }
+            .stepper-circle { width: 40px; height: 40px; font-size: 0.9rem; }
+            .stepper-track, .stepper-fill { top: 20px; left: 10%; right: 10%; }
+            .flow-deck { min-height: 460px; }
+            .flow-slide { padding: 22px; }
+            .flow-slide h3 { font-size: 1.2rem; }
+            .flow-slide-body { font-size: 0.97rem; }
+            .footer-top { flex-direction: column; text-align: center; }
+            #particles-js { opacity: 0.7; }
+            section { padding: 60px 20px; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-container > * { animation: fadeInUp 0.6s ease forwards; }
+        .hero-container > *:nth-child(2) { animation-delay: 0.1s; }
+        .hero-container > *:nth-child(3) { animation-delay: 0.2s; }
+        .hero-container > *:nth-child(4) { animation-delay: 0.3s; }
+        .hero-container > *:nth-child(5) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="content-wrapper">
+
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#top" class="nav-logo">Governance<span> Gradient</span></a>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#hypothesis">Hypothesis</a></li>
+                <li><a href="#surfaces">Experiments</a></li>
+                <li><a href="#l1-agentforce">L1</a></li>
+                <li><a href="#l2-cursor">L2</a></li>
+                <li><a href="#l3-dashboard">L3</a></li>
+                <li><a href="#l4-today">L4</a></li>
+                <li><a href="#findings">Findings</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu">
+        <ul>
+            <li><a href="#problem">Customer Challenge</a></li>
+            <li><a href="#hypothesis">Hypothesis &amp; POC</a></li>
+            <li><a href="#surfaces">Four Experiments</a></li>
+            <li><a href="#l1-agentforce">L1 — Agentforce</a></li>
+            <li><a href="#l2-cursor">L2 — Cursor</a></li>
+            <li><a href="#l3-dashboard">L3 — sf-dashboard</a></li>
+            <li><a href="#l4-today">L4 — agentforce-today</a></li>
+            <li><a href="#findings">Governance Matrix</a></li>
+            <li><a href="#tsp">Sample TSP</a></li>
+            <li><a href="#controls">Compensating Controls</a></li>
+            <li><a href="#appendix-architecture">Appendix: Architecture</a></li>
+        </ul>
+    </div>
+
+    <!-- ─────────────────── HERO ─────────────────── -->
+    <section class="hero" id="top">
+        <div class="hero-container">
+            <div class="hero-eyebrow">
+                <i class="fas fa-layer-group"></i>
+                Internal POC &middot; Shield Observability &middot; Spring &rsquo;26
+            </div>
+            <div class="hero-brand-logo">
+                <img src="amersecurityarchitects-logo.png" alt="Amer Security Architects">
+            </div>
+            <h1>The Governance Gradient &mdash; <span>four experiments in control</span></h1>
+            <p class="hero-description">
+                Four surfaces, one org, incrementally decreasing visibility. From fully native Agentforce to MCP-routed headless apps &mdash; how does Shield&rsquo;s control plane hold up as you move away from the platform? Hypothesis: Agentforce wins by design because governance is baked in.
+            </p>
+            <div class="hero-buttons">
+                <a href="#problem" class="btn btn-primary">
+                    <i class="fas fa-bullseye"></i> See the Customer Challenge
+                </a>
+                <a href="#findings" class="btn btn-secondary">
+                    <i class="fas fa-table"></i> Jump to Findings
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="num">L1</div>
+                    <div class="label">Agentforce &mdash; full governance</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num">L2</div>
+                    <div class="label">Cursor &mdash; ApiEvent visible</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num">L3</div>
+                    <div class="label">sf-dashboard &mdash; visible if Connected App, blind if ECA</div>
+                </div>
+                <div class="hero-stat" style="border-color: rgba(245,158,11,0.5);">
+                    <div class="num" style="color: #f59e0b;">L4</div>
+                    <div class="label">agentforce-today &mdash; MCP blind</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 1. THE CUSTOMER CHALLENGE ─────────────────── -->
+    <section class="section-light" id="problem">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-comments"></i></div>
+            <h2 class="section-title">The customer challenge</h2>
+            <p class="section-lede">
+                The team gets the same question from customers every week. It started with one sentence from Rachel and grew into this POC.
+            </p>
+
+            <div class="quote-box">
+                &ldquo;The real-life customer challenge that our team is being asked about all the time is&nbsp;<em>what is being edited by an agent versus a person</em>. How do you know if it&rsquo;s an agent acting on behalf of a person versus the person did it? And how do you detect if an agent is doing something outside of the bounds of what it should be doing?&rdquo;
+                <span class="attribution">&mdash; Rachel Beard, 2026-05-22 onboarding chat</span>
+            </div>
+
+            <div class="deep-dive-grid">
+                <div class="deep-dive-card">
+                    <h3 style="white-space: nowrap;"><i class="fas fa-user-secret"></i> The three questions customers ask</h3>
+                    <p class="sub">Every variant of the conversation boils down to these.</p>
+                    <ul>
+                        <li><i class="fas fa-circle-question"></i> <span><strong>Attribution</strong> &mdash; &ldquo;Did the user edit that record, or did an agent edit it on their behalf?&rdquo;</span></li>
+                        <li><i class="fas fa-circle-question"></i> <span><strong>Containment</strong> &mdash; &ldquo;How do we detect an agent doing something outside the scope of what it should be doing?&rdquo;</span></li>
+                        <li><i class="fas fa-circle-question"></i> <span><strong>Enforcement</strong> &mdash; &ldquo;Can Shield &amp; Transaction Security actually <em>stop</em> an agent, or just observe it after the fact?&rdquo;</span></li>
+                    </ul>
+                </div>
+
+                <div class="deep-dive-card">
+                    <h3><i class="fas fa-triangle-exclamation"></i> Why these are hard to answer today</h3>
+                    <p class="sub">The team has the surface knowledge but not the demo.</p>
+                    <ul>
+                        <li><i class="fas fa-circle-info"></i> <span>No one on the team has seen a <strong>live demo of Event Monitoring for Agentforce</strong>.</span></li>
+                        <li><i class="fas fa-circle-info"></i> <span>TSPs <em>exist</em> for Agentforce but no one can articulate a sharp use case that the agent&rsquo;s permissions wouldn&rsquo;t already cover.</span></li>
+                        <li><i class="fas fa-circle-info"></i> <span>MCP + A2A is the question of the moment &mdash; and the team admits they <strong>don&rsquo;t have a good answer for it</strong>.</span></li>
+                        <li><i class="fas fa-circle-info"></i> <span>Customers don&rsquo;t just want to know what we <em>can</em> see &mdash; they want to know <strong>where the blind spots are</strong>.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ─────────────────── 2. HYPOTHESIS & POC ─────────────────── -->
+    <section class="section-gray" id="hypothesis">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-flask"></i></div>
+            <h2 class="section-title">Hypothesis &amp; the POC</h2>
+            <p class="section-lede">
+                What we set out to test, and the bench we built to test it.
+            </p>
+
+            <div class="deep-dive-grid">
+                <div class="deep-dive-card">
+                    <h3><i class="fas fa-vial"></i> The governance gradient hypothesis</h3>
+                    <p class="sub">Agentforce has a distinct advantage because governance is baked in.</p>
+                    <ul>
+                        <li><i class="fas fa-arrow-right"></i> <span><strong>Native Agentforce</strong> should deliver the highest level of control &mdash; full governance, full visibility, full TSP coverage &mdash; because the entire stack runs inside Salesforce.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>As you move <strong>away from the platform</strong> toward external apps, governance should erode predictably, but the key question is: <em>where does it actually break?</em></span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>The <strong>token type</strong> an app uses &mdash; Connected App session token vs. ECA JWT &mdash; determines real-time Shield visibility more than the API path. An app can hit direct REST and still be invisible to Shield if it authenticates via ECA.</span></li>
+                    </ul>
+                </div>
+
+                <div class="deep-dive-card">
+                    <h3><i class="fas fa-screwdriver-wrench"></i> What I built to test it</h3>
+                    <p class="sub">A single org, four live consumer surfaces, one streaming monitor.</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> <span><strong>Live Event Monitor LWC</strong> on a FlexiPage in the org, polling RTEM BigObjects every 5s and tagging each card with a source-specific icon.</span></li>
+                        <li><i class="fas fa-check"></i> <span><strong>Agentforce agent</strong> built in Agent Builder with a topic that runs SOQL via tool calls.</span></li>
+                        <li><i class="fas fa-check"></i> <span><strong>Cursor IDE</strong> making <code>sf data query</code> calls via sf-cli.</span></li>
+                        <li><i class="fas fa-check"></i> <span><strong>sf-dashboard</strong> &mdash; a Node.js app using Direct REST, tested with both ECA JWT (invisible to Shield) and Connected App session token (fully visible). The auth method, not the API path, is the variable.</span></li>
+                        <li><i class="fas fa-check"></i> <span><strong>agentforce-today</strong> &mdash; a <em>React app built from scratch</em> that routes SOQL through the Hosted MCP gateway + Anthropic LLM for daily briefings.</span></li>
+                        <li><i class="fas fa-check"></i> <span>Drafted a sample TSP Apex class to test whether <em>enforcement</em> would actually fire for each surface.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="callout callout-warn">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Spoiler &mdash; the gradient is real, with a twist at L3</strong>
+                    Levels 1&ndash;2 maintain full Shield visibility. Level 3 is <strong>conditional</strong> &mdash; Connected App session token gives full visibility; ECA JWT gives none, even over direct REST. Level 4 (Hosted MCP) falls off the map entirely. The story isn&rsquo;t just &ldquo;Agentforce is better&rdquo; &mdash; it&rsquo;s that the <strong>token type</strong> is the governance variable customers are choosing without realising it.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 3. THE FOUR SURFACES ─────────────────── -->
+    <section class="section-light" id="surfaces">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-layer-group"></i></div>
+            <h2 class="section-title">Four experiments &mdash; incrementally decreasing control</h2>
+            <p class="section-lede">
+                Each surface represents a real customer pattern, ordered from highest governance (L1) to lowest (L4). The further you move from native Agentforce, the more control and visibility erodes.
+            </p>
+
+            <div class="layer-grid">
+                <!-- Agentforce — L1: Full Governance -->
+                <div class="layer-card" style="border-left-color: #10b981;">
+                    <div class="surface-icon-tile">
+                        <svg viewBox="0 0 40 40" aria-label="Agentforce">
+                            <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#0176D3"/>
+                            <text x="20" y="27" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">A</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="layer-name"><span style="display: inline-block; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;">L1</span>Agentforce</div>
+                        <div class="layer-sub">In-org agent &mdash; <strong style="color: #10b981;">full governance baked in</strong></div>
+                    </div>
+                    <div class="layer-components">
+                        <span class="pill"><i class="fas fa-robot"></i> Agent Builder Topic</span>
+                        <span class="pill"><i class="fas fa-database"></i> SOQL via tool call</span>
+                        <span class="pill pill-success"><i class="fas fa-eye"></i> Real-time ApiEvent</span>
+                        <span class="pill pill-success"><i class="fas fa-shield-halved"></i> TSP-evaluable</span>
+                        <span class="pill pill-success"><i class="fas fa-fingerprint"></i> BotId attribution</span>
+                    </div>
+                </div>
+
+                <!-- Cursor — L2: External IDE, still visible -->
+                <div class="layer-card" style="border-left-color: #0ea5e9;">
+                    <div class="surface-icon-tile">
+                        <svg viewBox="0 0 40 40" aria-label="Cursor">
+                            <rect x="2" y="2" width="36" height="36" rx="7" fill="#0f172a"/>
+                            <path d="M12 13 L28 22 L12 31 Z" fill="none" stroke="#e2e8f0" stroke-width="2.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="layer-name"><span style="display: inline-block; background: #0ea5e9; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;">L2</span>Cursor</div>
+                        <div class="layer-sub">External IDE via <code>sf data query</code> &mdash; <strong style="color: #0ea5e9;">ApiEvent visible</strong></div>
+                    </div>
+                    <div class="layer-components">
+                        <span class="pill"><i class="fas fa-terminal"></i> sfdx / sf-cli</span>
+                        <span class="pill"><i class="fas fa-key"></i> User OAuth token</span>
+                        <span class="pill pill-success"><i class="fas fa-eye"></i> Real-time ApiEvent</span>
+                        <span class="pill pill-success"><i class="fas fa-shield-halved"></i> TSP-evaluable</span>
+                    </div>
+                </div>
+
+                <!-- sf-dashboard — L3: Headless app, Direct REST -->
+                <div class="layer-card" style="border-left-color: #8b5cf6;">
+                    <div class="surface-icon-tile">
+                        <svg viewBox="0 0 40 40" aria-label="sf-dashboard">
+                            <circle cx="20" cy="20" r="17" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+                            <text x="20" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#ef4444">D</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="layer-name"><span style="display: inline-block; background: #8b5cf6; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;">L3</span>sf-dashboard</div>
+                        <div class="layer-sub">Headless Node app · <strong style="color: #8b5cf6;">Direct REST &mdash; visible if Connected App, blind if ECA</strong></div>
+                    </div>
+                    <div class="layer-components">
+                        <span class="pill"><i class="fas fa-globe"></i> /services/data/.../query</span>
+                        <span class="pill"><i class="fas fa-key"></i> PKCE OAuth, user token</span>
+                        <span class="pill pill-warn"><i class="fas fa-eye"></i> ApiEvent: Connected App ✅ / ECA ❌</span>
+                        <span class="pill pill-warn"><i class="fas fa-shield-halved"></i> TSP: Connected App ✅ / ECA ❌</span>
+                    </div>
+                </div>
+
+                <!-- agentforce-today — L4: MCP routed, lowest visibility -->
+                <div class="layer-card is-warning" style="border-left-color: #f59e0b;">
+                    <div class="surface-icon-tile" style="background: linear-gradient(180deg, #FFF8E1 0%, #FEF3C7 100%); border-color: #FDE68A;">
+                        <svg viewBox="0 0 40 40" aria-label="agentforce-today">
+                            <rect x="3" y="5" width="34" height="30" rx="5" fill="#1e293b"/>
+                            <rect x="8" y="11" width="24" height="3" rx="1.5" fill="#22d3ee"/>
+                            <rect x="8" y="18" width="18" height="3" rx="1.5" fill="#94a3b8"/>
+                            <rect x="8" y="25" width="22" height="3" rx="1.5" fill="#94a3b8"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="layer-name"><span style="display: inline-block; background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;">L4</span>agentforce-today</div>
+                        <div class="layer-sub">Headless React app · <strong style="color: #f59e0b;">Hosted MCP &mdash; visibility gap</strong></div>
+                    </div>
+                    <div class="layer-components">
+                        <span class="pill"><i class="fas fa-server"></i> api.salesforce.com/.../mcp</span>
+                        <span class="pill"><i class="fas fa-key"></i> PKCE OAuth, user token</span>
+                        <span class="pill pill-warn"><i class="fas fa-eye-slash"></i> Login only in real time</span>
+                        <span class="pill pill-danger"><i class="fas fa-ban"></i> No query-level TSP</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout callout-info">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                    <strong>The whole story sits in token type and API path — L3 is the pivot point</strong>
+                    Both are external apps. Both log in with the user&rsquo;s OAuth token. One sends SOQL <em>directly</em> to the org&rsquo;s REST endpoint; the other routes the same SOQL through Salesforce&rsquo;s Hosted MCP gateway. Same user, same query, same intent &mdash; completely different telemetry footprint.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- ─────────────────── L1. AGENTFORCE DEEP-DIVE ─────────────────── -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="section-featured" id="l1-agentforce">
+        <div class="section-container">
+            <div class="section-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"><i class="fas fa-robot"></i></div>
+            <h2 class="section-title"><span style="background: #10b981; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 0.7em; margin-right: 12px; vertical-align: middle;">L1</span>Agentforce &mdash; full governance by design</h2>
+            <p class="section-lede">
+                The baseline. In-org agent, in-platform governance. Everything Shield offers is available here.
+            </p>
+
+            <div class="stepper stepper-4" id="l1Stepper" role="tablist" aria-label="L1 Agentforce flow">
+                <div class="stepper-track"></div>
+                <div class="stepper-fill" id="l1StepperFill"></div>
+                <button class="stepper-btn is-active" type="button" data-step="1" role="tab" aria-selected="true">
+                    <div class="stepper-circle"><span class="stepper-num">1</span></div>
+                    <div class="stepper-label">How it connects</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="2" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">2</span></div>
+                    <div class="stepper-label">What Shield sees</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="3" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">3</span></div>
+                    <div class="stepper-label">Full governance stack</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="4" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">4</span></div>
+                    <div class="stepper-label">Live demo</div>
+                </button>
+            </div>
+
+            <div class="flow-deck" id="l1Deck">
+                <div class="flow-slide is-active" data-step="1" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 01</span> How Agentforce connects</div>
+                        <div class="flow-slide-counter">01 / 04</div>
+                    </div>
+                    <h3>In-org agent built in Agent Builder</h3>
+                    <p class="flow-slide-body">
+                        Agentforce agents live inside the org. They&rsquo;re configured via <strong>Agent Builder</strong> with Topics, Actions, and Instructions. When the agent needs CRM data, it invokes a <strong>tool call</strong> that runs SOQL internally. No external API hop. The user&rsquo;s session context (including identity) flows through the entire operation.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">Agent runs in user&rsquo;s session context</div>
+                        <div class="flow-slide-artifact">SOQL via internal tool call</div>
+                        <div class="flow-slide-artifact">No external REST endpoint involved</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="2" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 02</span> What Shield sees</div>
+                        <div class="flow-slide-counter">02 / 04</div>
+                    </div>
+                    <h3>Full real-time visibility + agent attribution</h3>
+                    <p class="flow-slide-body">
+                        Every SOQL generates an <code>ApiEvent</code> in real-time. Critically, the event includes <strong><code>BotId</code></strong> &mdash; the platform&rsquo;s native identifier for the agent that ran the query. This is the cleanest attribution story: you can tell not just <em>who</em> but <em>what agent</em> performed the operation.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">ApiEvent: real-time, full detail</div>
+                        <div class="flow-slide-artifact">BotId: agent-level attribution</div>
+                        <div class="flow-slide-artifact">LoginEvent: user session tracked</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="3" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 03</span> Full governance stack</div>
+                        <div class="flow-slide-counter">03 / 04</div>
+                    </div>
+                    <h3>Agentforce-only controls &mdash; layers L2–L4 don&rsquo;t have</h3>
+                    <p class="flow-slide-body">
+                        Beyond TSPs and ApiEvent, Agentforce delivers an <strong>entire governance stack</strong> that external surfaces cannot replicate:
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0;">
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-shield-halved" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Einstein Trust Layer</strong> &mdash; prompt injection defense, toxicity filtering, PII masking at the LLM boundary</span>
+                        </div>
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-code-branch" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Guardrails on Subagents</strong> &mdash; declarative limits on what child agents can invoke</span>
+                        </div>
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-user-check" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Human-in-the-loop</strong> &mdash; approval steps, confirmation prompts, escalation flows</span>
+                        </div>
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-timeline" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Session tracing</strong> &mdash; full conversation replay with tool calls and reasoning steps</span>
+                        </div>
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-file-lines" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Event Logs</strong> &mdash; standard EventLogFile captures for audit</span>
+                        </div>
+                        <div class="flow-slide-artifact" style="display: flex; align-items: flex-start; gap: 10px; padding: 12px;">
+                            <i class="fas fa-file-circle-plus" style="color: #10b981; margin-top: 2px;"></i>
+                            <span><strong>Enhanced Event Logs</strong> &mdash; richer agent-specific telemetry in Data Cloud</span>
+                        </div>
+                    </div>
+                    <p class="flow-slide-body" style="margin-top: 12px;">
+                        <strong>Plus full TSP coverage:</strong> scope policies to <code>BotId != null</code> for agent-only rules. Row limits, entity restrictions, time-of-day &mdash; all enforceable.
+                    </p>
+                </div>
+
+                <div class="flow-slide is-demo" data-step="4" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 04</span> Live demo</div>
+                        <div class="flow-slide-counter">04 / 04</div>
+                    </div>
+                    <div class="demo-badge"><i class="fas fa-play-circle"></i> Live Demo</div>
+                    <h3>What was observed</h3>
+                    <div class="demo-observations">
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Agent conversation triggered SOQL via topic action &mdash; <strong>ApiEvent appeared in Streaming Monitor within seconds</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span><code>ApiEvent.BotId</code> populated with the agent&rsquo;s ID &mdash; <strong>clear agent attribution</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Hexagonal &ldquo;A&rdquo; icon rendered in the monitor &mdash; <strong>visually distinct from user-initiated queries</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>TSP with <code>BotId != null</code> condition <strong>fired successfully</strong> on the agent&rsquo;s query</span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Behind the scenes: Trust Layer, guardrails, session tracing &mdash; <strong>the full governance stack L2–L4 don&rsquo;t have</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-controls">
+                <button class="flow-ctrl-btn" type="button" data-stepper="l1" data-dir="prev" aria-label="Previous step"><i class="fas fa-chevron-left"></i> Previous</button>
+                <div class="flow-counter-display"><span class="flow-current" data-stepper="l1">01</span> / 04</div>
+                <button class="flow-ctrl-btn is-primary" type="button" data-stepper="l1" data-dir="next" aria-label="Next step">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── L2. CURSOR DEEP-DIVE ─────────────────── -->
+    <section class="section-featured" id="l2-cursor">
+        <div class="section-container">
+            <div class="section-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);"><i class="fas fa-code"></i></div>
+            <h2 class="section-title"><span style="background: #0ea5e9; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 0.7em; margin-right: 12px; vertical-align: middle;">L2</span>Cursor &mdash; external IDE, still fully visible</h2>
+            <p class="section-lede">
+                One step away from native. External IDE using sf-cli, direct REST under the hood. Governance holds.
+            </p>
+
+            <div class="stepper stepper-4" id="l2Stepper" role="tablist" aria-label="L2 Cursor flow">
+                <div class="stepper-track"></div>
+                <div class="stepper-fill" id="l2StepperFill"></div>
+                <button class="stepper-btn is-active" type="button" data-step="1" role="tab" aria-selected="true">
+                    <div class="stepper-circle"><span class="stepper-num">1</span></div>
+                    <div class="stepper-label">How it connects</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="2" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">2</span></div>
+                    <div class="stepper-label">What Shield sees</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="3" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">3</span></div>
+                    <div class="stepper-label">TSP coverage</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="4" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">4</span></div>
+                    <div class="stepper-label">Live demo</div>
+                </button>
+            </div>
+
+            <div class="flow-deck" id="l2Deck">
+                <div class="flow-slide is-active" data-step="1" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 01</span> How Cursor connects</div>
+                        <div class="flow-slide-counter">01 / 04</div>
+                    </div>
+                    <h3>IDE agent shells out to sf-cli</h3>
+                    <p class="flow-slide-body">
+                        Cursor&rsquo;s AI assistant runs <code>sf data query</code> via the Salesforce CLI. Under the hood, sf-cli uses <strong>direct REST</strong> to the org&rsquo;s instance URL. The user&rsquo;s OAuth token (from <code>sf org login</code>) authenticates every call. No gateway in between.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">sf data query -q "SELECT..."</div>
+                        <div class="flow-slide-artifact">Direct REST to org instance</div>
+                        <div class="flow-slide-artifact">User OAuth token authenticates call</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="2" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 02</span> What Shield sees</div>
+                        <div class="flow-slide-counter">02 / 04</div>
+                    </div>
+                    <h3>Full real-time visibility &mdash; user-attributed</h3>
+                    <p class="flow-slide-body">
+                        Every sf-cli query generates an <code>ApiEvent</code> in real-time. The event shows the user, the SOQL, rows processed, and the client (<code>sfdx</code> or similar). No <code>BotId</code> (it&rsquo;s not an Agentforce agent), but the user attribution is clean and complete.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">ApiEvent: real-time, full detail</div>
+                        <div class="flow-slide-artifact">Username: user who ran the query</div>
+                        <div class="flow-slide-artifact">Client: sfdx / sf-cli identifier</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="3" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 03</span> TSP coverage</div>
+                        <div class="flow-slide-counter">03 / 04</div>
+                    </div>
+                    <h3>Full TSP enforcement &mdash; scope by client or user</h3>
+                    <p class="flow-slide-body">
+                        TSPs fire on every sf-cli query. You can scope policies to the <code>sfdx</code> client specifically using <code>Client.containsIgnoreCase('sfdx')</code>. Row limits, time restrictions, entity rules &mdash; all enforceable. The sample <code>CursorRowLimitPolicy</code> was built for exactly this surface.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">Block, alert, or end session</div>
+                        <div class="flow-slide-artifact">Scope to sfdx client</div>
+                        <div class="flow-slide-artifact">Sample policy: 1,000 row cap</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide is-demo" data-step="4" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 04</span> Live demo</div>
+                        <div class="flow-slide-counter">04 / 04</div>
+                    </div>
+                    <div class="demo-badge"><i class="fas fa-play-circle"></i> Live Demo</div>
+                    <h3>What was observed</h3>
+                    <div class="demo-observations">
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ran <code>sf data query</code> from Cursor terminal &mdash; <strong>ApiEvent appeared in Streaming Monitor</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Client field showed <code>sfdx 2.x</code> &mdash; <strong>identifiable as CLI-driven</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Cursor tile icon rendered in monitor &mdash; <strong>source detection working</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>CursorRowLimitPolicy TSP <strong>fired when query exceeded 1,000 rows</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-controls">
+                <button class="flow-ctrl-btn" type="button" data-stepper="l2" data-dir="prev" aria-label="Previous step"><i class="fas fa-chevron-left"></i> Previous</button>
+                <div class="flow-counter-display"><span class="flow-current" data-stepper="l2">01</span> / 04</div>
+                <button class="flow-ctrl-btn is-primary" type="button" data-stepper="l2" data-dir="next" aria-label="Next step">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── L3. SF-DASHBOARD DEEP-DIVE ─────────────────── -->
+    <section class="section-featured" id="l3-dashboard">
+        <div class="section-container">
+            <div class="section-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"><i class="fas fa-gauge-high"></i></div>
+            <h2 class="section-title"><span style="background: #8b5cf6; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 0.7em; margin-right: 12px; vertical-align: middle;">L3</span>sf-dashboard &mdash; headless app, direct REST</h2>
+            <p class="section-lede">
+                Fully headless Node.js app. Direct REST &mdash; but governance depends on the token type, not the API path. Connected App = full visibility. ECA JWT = blind spot.
+            </p>
+
+            <div class="stepper stepper-4" id="l3Stepper" role="tablist" aria-label="L3 sf-dashboard flow">
+                <div class="stepper-track"></div>
+                <div class="stepper-fill" id="l3StepperFill"></div>
+                <button class="stepper-btn is-active" type="button" data-step="1" role="tab" aria-selected="true">
+                    <div class="stepper-circle"><span class="stepper-num">1</span></div>
+                    <div class="stepper-label">How it connects</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="2" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">2</span></div>
+                    <div class="stepper-label">What Shield sees</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="3" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">3</span></div>
+                    <div class="stepper-label">TSP coverage</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="4" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">4</span></div>
+                    <div class="stepper-label">Live demo</div>
+                </button>
+            </div>
+
+            <div class="flow-deck" id="l3Deck">
+                <div class="flow-slide is-active" data-step="1" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 01</span> How sf-dashboard connects</div>
+                        <div class="flow-slide-counter">01 / 04</div>
+                    </div>
+                    <h3>Headless Node app &mdash; token type is the critical variable</h3>
+                    <p class="flow-slide-body">
+                        <code>sf-dashboard</code> is a local Node.js app that calls the org&rsquo;s <strong>direct REST endpoint</strong> (<code>/services/data/v66.0/query</code>) &mdash; no MCP, no gateway. Observability is entirely determined by <strong>how it authenticates</strong>, not what API it calls. With a standard Connected App session token (<code>00D&hellip;</code>), queries are fully visible. With an ECA-issued JWT (<code>eyJ&hellip;</code>), they are not &mdash; even though the API call is identical.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">Connected App → 00D session token → ✅ visible</div>
+                        <div class="flow-slide-artifact">ECA → eyJ JWT token → ❌ invisible</div>
+                        <div class="flow-slide-artifact">Same REST endpoint either way</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="2" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 02</span> What Shield sees</div>
+                        <div class="flow-slide-counter">02 / 04</div>
+                    </div>
+                    <h3>What Shield sees &mdash; depends entirely on auth method</h3>
+                    <p class="flow-slide-body">
+                        <strong>Connected App (session token):</strong> every query generates a real-time <code>ApiEvent</code> with full detail &mdash; user, SOQL, rows processed, <code>ConnectedAppId</code>, source IP. TSPs fire. Streaming monitor shows every call.<br><br>
+                        <strong>ECA (JWT token):</strong> zero <code>ApiEvent</code> records generated. Empirically verified &mdash; 200 records queried across the org, not one from an ECA-authenticated source. Activity only surfaces in the daily <code>RestApi</code> EventLogFile. The <code>LoginEvent</code> for the OAuth handshake is visible, but every subsequent query is a black box to real-time Shield.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">Connected App: ApiEvent ✅ real-time</div>
+                        <div class="flow-slide-artifact">ECA JWT: ApiEvent ❌ zero records</div>
+                        <div class="flow-slide-artifact">ECA JWT: EventLogFile ✅ next day only</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="3" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 03</span> TSP coverage</div>
+                        <div class="flow-slide-counter">03 / 04</div>
+                    </div>
+                    <h3>TSP enforcement &mdash; Connected App yes, ECA no</h3>
+                    <p class="flow-slide-body">
+                        <strong>Connected App:</strong> TSPs fire on every query. Scope by <code>ConnectedAppId</code> for per-app governance &mdash; row limits, entity restrictions, time-of-day rules, block or alert. Fully enforceable.<br><br>
+                        <strong>ECA:</strong> TSPs evaluate on <code>ApiEvent</code>. Since ECA JWT sessions generate no <code>ApiEvent</code> records, policy conditions never trigger &mdash; not even to allow the query through. A row-limit rule that works perfectly for Connected App traffic is silently ignored for the same query from an ECA-authenticated app. No real-time control path exists today.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">Connected App: TSP ✅ fully enforceable</div>
+                        <div class="flow-slide-artifact">ECA: TSP ❌ conditions never fire</div>
+                        <div class="flow-slide-artifact">ECA gap: platform roadmap item</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide is-demo" data-step="4" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 04</span> Live demo</div>
+                        <div class="flow-slide-counter">04 / 04</div>
+                    </div>
+                    <div class="demo-badge"><i class="fas fa-play-circle"></i> Live Demo</div>
+                    <h3>What was observed</h3>
+                    <div class="demo-observations">
+                        <div class="demo-observation">
+                            <i class="fas fa-times-circle" style="color:#ef4444"></i>
+                            <span>ECA JWT token (default OAuth flow) &mdash; <strong>zero ApiEvent records generated</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-times-circle" style="color:#ef4444"></i>
+                            <span>200 ApiEvent records queried &mdash; <strong>not one from an ECA-authenticated source</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Connected App session token injected &mdash; <strong>ApiEvent appeared in Streaming Monitor immediately</strong></span>
+                        </div>
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>ConnectedAppId = Salesforce CLI (<code>0H4Ho0000016ZJFKA2</code>) &mdash; <strong>app-level attribution confirmed</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-controls">
+                <button class="flow-ctrl-btn" type="button" data-stepper="l3" data-dir="prev" aria-label="Previous step"><i class="fas fa-chevron-left"></i> Previous</button>
+                <div class="flow-counter-display"><span class="flow-current" data-stepper="l3">01</span> / 04</div>
+                <button class="flow-ctrl-btn is-primary" type="button" data-stepper="l3" data-dir="next" aria-label="Next step">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── L4. AGENTFORCE-TODAY DEEP-DIVE ─────────────────── -->
+    <section class="section-featured" id="l4-today">
+        <div class="section-container">
+            <div class="section-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"><i class="fas fa-triangle-exclamation"></i></div>
+            <h2 class="section-title"><span style="background: #f59e0b; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 0.7em; margin-right: 12px; vertical-align: middle;">L4</span>agentforce-today &mdash; MCP routed, visibility gap</h2>
+            <p class="section-lede">
+                The cliff. Same user, same OAuth, same intent &mdash; routed through Hosted MCP. Governance breaks.
+            </p>
+
+            <div class="stepper stepper-4" id="l4Stepper" role="tablist" aria-label="L4 agentforce-today flow">
+                <div class="stepper-track"></div>
+                <div class="stepper-fill" id="l4StepperFill"></div>
+                <button class="stepper-btn is-active" type="button" data-step="1" role="tab" aria-selected="true">
+                    <div class="stepper-circle"><span class="stepper-num">1</span></div>
+                    <div class="stepper-label">How it connects</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="2" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">2</span></div>
+                    <div class="stepper-label">What Shield sees</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="3" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">3</span></div>
+                    <div class="stepper-label">TSP coverage</div>
+                </button>
+                <button class="stepper-btn" type="button" data-step="4" role="tab" aria-selected="false">
+                    <div class="stepper-circle"><span class="stepper-num">4</span></div>
+                    <div class="stepper-label">Live demo</div>
+                </button>
+            </div>
+
+            <div class="flow-deck" id="l4Deck">
+                <div class="flow-slide is-active" data-step="1" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 01</span> How agentforce-today connects</div>
+                        <div class="flow-slide-counter">01 / 04</div>
+                    </div>
+                    <h3>React app built from scratch &mdash; routed through Hosted MCP</h3>
+                    <p class="flow-slide-body">
+                        <code>agentforce-today</code> is a <strong>React app I built from scratch</strong> that uses the same PKCE OAuth flow as sf-dashboard. The difference: instead of hitting the org&rsquo;s REST endpoint, it routes SOQL through <strong>Salesforce&rsquo;s Hosted MCP gateway</strong>: <code>api.salesforce.com/platform/mcp/v1/…</code>. The user&rsquo;s token authenticates them <em>to the gateway</em>, not <em>through it</em>.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact">React + Vite + Anthropic LLM</div>
+                        <div class="flow-slide-artifact">api.salesforce.com/platform/mcp/v1/...</div>
+                        <div class="flow-slide-artifact">User token authenticates TO gateway</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="2" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 02</span> What Shield sees</div>
+                        <div class="flow-slide-counter">02 / 04</div>
+                    </div>
+                    <h3>LoginEvent only &mdash; no ApiEvent for queries</h3>
+                    <p class="flow-slide-body">
+                        The OAuth login generates a <code>LoginEvent</code> &mdash; that part works. But the SOQL? It runs server-side as Salesforce&rsquo;s internal <code>cloud@…</code> <code>CloudIntegrationUser</code>. <strong>No <code>ApiEvent</code> is generated for the user&rsquo;s session.</strong> The query activity surfaces 24 hours later in <code>ApiTotalUsage</code> EventLogFile &mdash; aggregated, not real-time, and attributed to the system user.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact is-warning">LoginEvent: yes (real-time)</div>
+                        <div class="flow-slide-artifact is-danger">ApiEvent: NO &mdash; visibility gap</div>
+                        <div class="flow-slide-artifact">ApiTotalUsage: 24h lag, aggregated</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide" data-step="3" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 03</span> TSP coverage</div>
+                        <div class="flow-slide-counter">03 / 04</div>
+                    </div>
+                    <h3>No query-level TSP &mdash; only LoginEvent binary block</h3>
+                    <p class="flow-slide-body">
+                        <strong>TSPs cannot enforce query-level policies</strong> because there is no <code>ApiEvent</code> to evaluate. The only enforcement option is a <code>LoginEvent</code> TSP that blocks the session entirely based on gateway IP or login pattern. It&rsquo;s binary (allow or block the whole session), not granular. No row limits. No entity restrictions. No time rules.
+                    </p>
+                    <div class="flow-slide-artifacts">
+                        <div class="flow-slide-artifact is-danger">No ApiEvent = no query TSP</div>
+                        <div class="flow-slide-artifact is-warning">LoginEvent TSP: binary block only</div>
+                        <div class="flow-slide-artifact">Gateway IPs: 3.234.75.13, 3.211.112.171</div>
+                    </div>
+                </div>
+
+                <div class="flow-slide is-demo" data-step="4" role="tabpanel">
+                    <div class="flow-slide-meta">
+                        <div class="flow-slide-eyebrow"><span class="step-pill">Step 04</span> Live demo</div>
+                        <div class="flow-slide-counter">04 / 04</div>
+                    </div>
+                    <div class="demo-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"><i class="fas fa-play-circle"></i> Live Demo</div>
+                    <h3>What was observed</h3>
+                    <div class="demo-observations">
+                        <div class="demo-observation">
+                            <i class="fas fa-check-circle"></i>
+                            <span>LoginEvent appeared immediately &mdash; <strong>OAuth flow visible</strong></span>
+                        </div>
+                        <div class="demo-observation is-danger">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Triggered briefing (SOQL ran) &mdash; <strong>NO ApiEvent appeared in Streaming Monitor</strong></span>
+                        </div>
+                        <div class="demo-observation is-danger">
+                            <i class="fas fa-times-circle"></i>
+                            <span>CursorRowLimitPolicy TSP <strong>did NOT fire</strong> &mdash; no event to evaluate</span>
+                        </div>
+                        <div class="demo-observation is-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Activity visible 24h later in ApiTotalUsage &mdash; <strong>attributed to CloudIntegrationUser</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-controls">
+                <button class="flow-ctrl-btn" type="button" data-stepper="l4" data-dir="prev" aria-label="Previous step"><i class="fas fa-chevron-left"></i> Previous</button>
+                <div class="flow-counter-display"><span class="flow-current" data-stepper="l4">01</span> / 04</div>
+                <button class="flow-ctrl-btn is-primary" type="button" data-stepper="l4" data-dir="next" aria-label="Next step">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="quote-box" style="margin-top: 40px; border-left-color: #f59e0b;">
+                <strong style="color: #f59e0b;">The honest conclusion:</strong> Every Shield control that could restrict data access operates downstream of <code>ApiEvent</code>. Since MCP bypasses that event surface, none of them have visibility into query operations. The only control with real teeth is a <code>LoginEvent</code> TSP &mdash; and that&rsquo;s a binary block, not granular governance.
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 5. FINDINGS — VISIBILITY MATRIX ─────────────────── -->
+    <section class="section-light" id="findings">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-table"></i></div>
+            <h2 class="section-title">Findings &mdash; the governance matrix</h2>
+            <p class="section-lede">
+                Columns are the four governance levels (L1–L4). Rows are the audit surfaces Shield exposes. L1 and L2 are fully observable. L3 is conditional — visibility depends on auth method. L4 is the gap.
+            </p>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Visibility surface</th>
+                        <th>
+                            <svg class="col-icon" viewBox="0 0 40 40" aria-hidden="true">
+                                <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#0176D3"/>
+                                <text x="20" y="27" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#fff">A</text>
+                            </svg>
+                            Agentforce
+                        </th>
+                        <th>
+                            <svg class="col-icon" viewBox="0 0 40 40" aria-hidden="true">
+                                <rect x="2" y="2" width="36" height="36" rx="7" fill="#0f172a"/>
+                                <path d="M12 13 L28 22 L12 31 Z" fill="none" stroke="#e2e8f0" stroke-width="2.5" stroke-linejoin="round"/>
+                            </svg>
+                            Cursor
+                        </th>
+                        <th>
+                            <svg class="col-icon" viewBox="0 0 40 40" aria-hidden="true">
+                                <circle cx="20" cy="20" r="17" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+                                <text x="20" y="25" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#ef4444">D</text>
+                            </svg>
+                            sf-dashboard
+                        </th>
+                        <th>
+                            <svg class="col-icon" viewBox="0 0 40 40" aria-hidden="true">
+                                <rect x="3" y="5" width="34" height="30" rx="5" fill="#1e293b"/>
+                                <rect x="8" y="11" width="24" height="3" rx="1.5" fill="#22d3ee"/>
+                                <rect x="8" y="18" width="18" height="3" rx="1.5" fill="#94a3b8"/>
+                                <rect x="8" y="25" width="22" height="3" rx="1.5" fill="#94a3b8"/>
+                            </svg>
+                            agentforce-today
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Streaming monitor <span style="color:var(--gray-500);font-weight:400;display:block;font-size:0.85rem;">(real-time ApiEvent, ~60min lag)</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">Operation, query, rows, BotId</span></span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">ApiEvent + LoginEvent</span></span></td>
+                        <td><span class="status-cell is-warn"><span class="status-icon"><i class="fas fa-minus"></i></span>Conditional <span class="note">Connected App ✅ / ECA JWT ❌</span></span></td>
+                        <td><span class="status-cell is-warn"><span class="status-icon"><i class="fas fa-minus"></i></span>Login only <span class="note">queries bypass ApiEvent</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>EventLogFile <span style="color:var(--gray-500);font-weight:400;display:block;font-size:0.85rem;">(<code>ApiTotalUsage</code>, <code>Login</code>; daily ~24h lag)</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">Aggregated, user + ECA</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Login attribution <span style="color:var(--gray-500);font-weight:400;display:block;font-size:0.85rem;">Who established the session, from where</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">Salesforce CLI Connected App</span></span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">SF Dashboard ECA (Application field)</span></span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">node-fetch UA visible</span></span></td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>TSP enforcement on queries <span style="color:var(--gray-500);font-weight:400;display:block;font-size:0.85rem;">Block / alert based on rows, entity, client, …</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">ApiEvent-based</span></span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">ApiEvent-based</span></span></td>
+                        <td><span class="status-cell is-warn"><span class="status-icon"><i class="fas fa-minus"></i></span>Conditional <span class="note">Connected App ✅ / ECA JWT ❌</span></span></td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No <span class="note">no ApiEvent → no policy hook</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>TSP enforcement on login <span style="color:var(--gray-500);font-weight:400;display:block;font-size:0.85rem;">Block or alert at session establishment</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">only chokepoint for MCP path</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top:48px;color:var(--gray-900);font-size:1.35rem;font-weight:700;">Where MCP activity actually lands</h3>
+            <p style="color:var(--gray-700);margin-top:8px;">Inventory of Salesforce telemetry surfaces. Login is visible in real-time; <strong>query activity is the gap</strong>.</p>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Mechanism</th>
+                        <th>Latency</th>
+                        <th>Captures MCP queries?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Streaming API (<code>/event/LoginEvent</code>)</td>
+                        <td>Real-time</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">OAuth login visible immediately</span></span></td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>Streaming API (<code>/event/ApiEvent</code>)</td>
+                        <td>Real-time</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>Not generated <span class="note">queries not visible</span></span></td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>RTEM BigObject (<code>ApiEvent</code> SOQL)</td>
+                        <td>~60 minutes</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>Not generated</span></td>
+                    </tr>
+                    <tr>
+                        <td>EventLogFile &mdash; <code>ApiTotalUsage</code></td>
+                        <td>~24 hours</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">aggregated, user + ECA attributed</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>EventLogFile &mdash; <code>Login</code></td>
+                        <td>~24 hours</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes <span class="note">token exchanges visible</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>OAuth Usage (Setup UI)</td>
+                        <td>Minutes</td>
+                        <td><span class="status-cell is-warn"><span class="status-icon"><i class="fas fa-minus"></i></span>Partial <span class="note">usage count only, no query detail</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Debug Logs</td>
+                        <td>Real-time</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No <span class="note">runs as CloudIntegrationUser, not your user</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 6. WHY THE GAP EXISTS ─────────────────── -->
+    <section class="section-featured" id="why">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-diagram-project"></i></div>
+            <h2 class="section-title">Why the gap exists &mdash; two API patterns, two trust boundaries</h2>
+            <p class="section-lede">
+                The visibility difference isn&rsquo;t a bug. It&rsquo;s a direct consequence of where the trust boundary lives in each pattern.
+            </p>
+
+            <div class="deep-dive-grid">
+                <div class="deep-dive-card" style="border-top:4px solid var(--blue-600);">
+                    <h3>
+                        <svg viewBox="0 0 40 40" aria-hidden="true">
+                            <circle cx="20" cy="20" r="17" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+                            <text x="20" y="25" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#ef4444">D</text>
+                        </svg>
+                        Direct REST <span style="color:var(--gray-500);font-weight:500;font-size:0.95rem;">(sf-dashboard)</span>
+                    </h3>
+                    <p class="sub">User token authenticates AND authorises the operation at the data layer.</p>
+                    <ul>
+                        <li><i class="fas fa-arrow-right"></i> <span>Calls the org&rsquo;s instance URL directly: <code>https://&lt;org&gt;.my.salesforce.com/services/data/v63.0/query</code>.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>OAuth bearer = the user; the SOQL runs <em>as that user</em> on the database.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>Every query produces a real <code>ApiEvent</code> with username, IP, URI, method, rows, elapsed time, ConnectedAppId.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>Visible in real time, evaluable by TSPs, audit trail is per-query and per-user.</span></li>
+                    </ul>
+                </div>
+
+                <div class="deep-dive-card" style="border-top:4px solid var(--amber-600);">
+                    <h3>
+                        <svg viewBox="0 0 40 40" aria-hidden="true">
+                            <rect x="3" y="5" width="34" height="30" rx="5" fill="#1e293b"/>
+                            <rect x="8" y="11" width="24" height="3" rx="1.5" fill="#22d3ee"/>
+                            <rect x="8" y="18" width="18" height="3" rx="1.5" fill="#94a3b8"/>
+                            <rect x="8" y="25" width="22" height="3" rx="1.5" fill="#94a3b8"/>
+                        </svg>
+                        Hosted MCP gateway <span style="color:var(--gray-500);font-weight:500;font-size:0.95rem;">(agentforce-today)</span>
+                    </h3>
+                    <p class="sub">User token authenticates to the gateway only; execution happens as a system identity.</p>
+                    <ul>
+                        <li><i class="fas fa-arrow-right"></i> <span>Calls <code>api.salesforce.com/platform/mcp/v1/platform/sobject-all</code>.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>OAuth bearer authenticates the user to the gateway, but the SOQL runs server-side as <code>cloud@…</code> <code>CloudIntegrationUser</code> (Jetty/12.0.32, <code>155.226.x.x</code>).</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>The user&rsquo;s identity is not attached to the database operation in real time.</span></li>
+                        <li><i class="fas fa-arrow-right"></i> <span>No <code>ApiEvent</code>. Audit only through next-day <code>ApiTotalUsage</code> EventLogFile, attributed via ConnectedAppId.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="color:var(--white);font-size:1.3rem;margin:40px 0 12px;font-weight:700;">Where the per-user attribution actually breaks</h3>
+            <p style="color:rgba(255,255,255,0.85);margin-bottom:8px;">The Hosted-MCP request chain has five real hops. Stage four is where user-attribution is lost &mdash; everything after it inherits the gateway&rsquo;s service identity.</p>
+
+            <div class="pipeline">
+                <div class="pipeline-stage">
+                    <span class="pipeline-num">01</span>
+                    <h5>App</h5>
+                    <p>agentforce-today builds the SOQL on behalf of the user</p>
+                </div>
+                <div class="pipeline-stage">
+                    <span class="pipeline-num">02</span>
+                    <h5>OAuth</h5>
+                    <p>PKCE token issued; LoginEvent fired</p>
+                </div>
+                <div class="pipeline-stage">
+                    <span class="pipeline-num">03</span>
+                    <h5>Gateway in</h5>
+                    <p>POST to <code>api.salesforce.com/.../mcp</code> with user token</p>
+                </div>
+                <div class="pipeline-stage is-broken">
+                    <span class="pipeline-num">04</span>
+                    <h5>Identity swap</h5>
+                    <p>Gateway re-issues call as <code>CloudIntegrationUser</code></p>
+                </div>
+                <div class="pipeline-stage is-broken">
+                    <span class="pipeline-num">05</span>
+                    <h5>DB op</h5>
+                    <p>SOQL executes as system identity &mdash; no user-scoped <code>ApiEvent</code></p>
+                </div>
+                <div class="pipeline-stage">
+                    <span class="pipeline-num">06</span>
+                    <h5>Daily roll-up</h5>
+                    <p><code>ApiTotalUsage</code> EventLogFile, 24h later, aggregated</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info" style="background: rgba(255,255,255,0.08); border-left-color: var(--blue-400); color: var(--white);">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                    <strong>What is always visible &mdash; regardless of pattern</strong>
+                    Every OAuth flow produces a <code>LoginEvent</code> with identity, source IP, login type (<code>Remote Access 2.0</code>), browser/UA, and timestamp. The gap is only at the <em>query</em> layer, not at authentication. That single fact is what makes a <code>LoginEvent</code> TSP the one real lever customers retain against the MCP path.
+                </div>
+            </div>
+
+            <div class="callout callout-success" style="background: rgba(255,255,255,0.08); border-left-color: #10b981; color: var(--white);">
+                <i class="fas fa-shield-halved"></i>
+                <div>
+                    <strong>Why L1 has a distinct governance advantage</strong>
+                    Agentforce includes the <strong>Einstein Trust Layer</strong> &mdash; a security boundary between the agent and the LLM that handles data masking, prompt injection defense, toxicity filtering, and zero data retention. L2, L3, and L4 don&rsquo;t get this layer at all. They&rsquo;re just calling APIs directly; there&rsquo;s no intermediary sanitizing inputs or vetting outputs.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 7. SAMPLE TSP ─────────────────── -->
+    <section class="section-light" id="tsp">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-shield-halved"></i></div>
+            <h2 class="section-title">Sample Transaction Security Policy</h2>
+            <p class="section-lede">
+                A concrete TSP Apex class drafted as part of the POC &mdash; it caps sf-cli queries at 1,000 rows. It fires for Agentforce and Cursor unconditionally. It fires for sf-dashboard <em>only</em> when authenticated via a Connected App session token &mdash; not when using an ECA JWT. It does <em>not</em> fire for <code>agentforce-today</code> because no <code>ApiEvent</code> is generated there.
+            </p>
+
+            <div class="deep-dive-card" style="margin-top: 32px;">
+                <div class="code-block-title"><i class="fas fa-code"></i> CursorRowLimitPolicy.cls</div>
+                <div class="code-block"><span class="c-com">// TSP Apex class — evaluates ApiEvent in real time.</span>
+<span class="c-com">// Triggered: "API event with row count over threshold from sfdx-like client".</span>
+<span class="c-key">public class</span> <span class="c-fn">CursorRowLimitPolicy</span> <span class="c-key">implements</span> TxnSecurity.EventCondition {
+
+    <span class="c-key">public</span> <span class="c-tag">Boolean</span> evaluate(<span class="c-tag">SObject</span> event) {
+        <span class="c-tag">Map</span>&lt;<span class="c-tag">String</span>,<span class="c-tag">String</span>&gt; d = ((<span class="c-tag">ApiEvent</span>)event).getData();
+
+        <span class="c-tag">Integer</span> rows   = <span class="c-tag">Integer</span>.valueOf(d.get(<span class="c-str">'RowsProcessed'</span>) ?? <span class="c-str">'0'</span>);
+        <span class="c-tag">String</span>  client = d.get(<span class="c-str">'Client'</span>) ?? <span class="c-str">''</span>;
+        <span class="c-tag">String</span>  user   = d.get(<span class="c-str">'Username'</span>) ?? <span class="c-str">''</span>;
+
+        <span class="c-com">// Cap any sfdx-driven session at 1,000 rows per call.</span>
+        <span class="c-key">return</span> rows &gt; <span class="c-num">1000</span> &amp;&amp; client.containsIgnoreCase(<span class="c-str">'sfdx'</span>);
+    }
+}</div>
+
+                <div class="callout callout-success" style="margin-top: 8px;">
+                    <i class="fas fa-circle-check"></i>
+                    <div>
+                        <strong>When this fires, the TSP can</strong>
+                        block the query, end the session, fire an in-app notification, send an email to the security team, or post to a SIEM webhook &mdash; configured per policy in Setup. The Apex class is just the <em>condition</em>; the action is declarative.
+                    </div>
+                </div>
+            </div>
+
+            <div class="deep-dive-card" style="margin-top: 24px;">
+                <h3><i class="fas fa-sliders"></i> Conditions library &mdash; what else you can express</h3>
+                <p class="sub">Each condition below is a one-liner against an <code>ApiEvent</code> field. They compose with <code>&amp;&amp;</code> / <code>||</code> in the <code>evaluate()</code> method.</p>
+                <table class="compare-table" style="margin-top: 8px;">
+                    <thead>
+                        <tr>
+                            <th>Condition</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Too many rows returned</td>
+                            <td><code>RowsProcessed &gt; 1000</code></td>
+                        </tr>
+                        <tr>
+                            <td>Specific user</td>
+                            <td><code>Username = 'storm.3d…'</code></td>
+                        </tr>
+                        <tr>
+                            <td>Specific client</td>
+                            <td><code>Client LIKE '%sfdx%'</code></td>
+                        </tr>
+                        <tr>
+                            <td>Time of day</td>
+                            <td>EventDate outside business hours</td>
+                        </tr>
+                        <tr>
+                            <td>Specific sensitive object</td>
+                            <td><code>QueriedEntities CONTAINS 'Lead'</code></td>
+                        </tr>
+                        <tr>
+                            <td>Agent-originated only</td>
+                            <td><code>BotId != null</code> <span style="color:var(--gray-500);">(Agentforce only)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Headless ECA only</td>
+                            <td><code>ConnectedAppId IN (set of headless ECAs)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="color:var(--gray-900);font-size:1.35rem;margin:48px 0 12px;font-weight:700;">Where this TSP fires across the four surfaces</h3>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Surface</th>
+                        <th>ApiEvent produced?</th>
+                        <th>Sample TSP fires?</th>
+                        <th>If you need enforcement against this surface…</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Agentforce</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes &mdash; with <code>BotId != null</code> filter</span></td>
+                        <td>Use <code>BotId</code> as the discriminator; you can scope per-bot policies.</td>
+                    </tr>
+                    <tr>
+                        <td>Cursor (sf-cli)</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><code>Client LIKE '%sfdx%'</code> matches; the sample above is exactly this case.</td>
+                    </tr>
+                    <tr>
+                        <td>sf-dashboard (Direct REST)</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes</span></td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes &mdash; with <code>ConnectedAppId</code> filter</span></td>
+                        <td>Scope by ECA <code>ConnectedAppId</code> so the policy is app-specific.</td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>agentforce-today (Hosted MCP)</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No</span></td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>Never fires</span></td>
+                        <td><strong>Move enforcement to LoginEvent.</strong> Block the OAuth flow itself based on gateway IP / login pattern.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warn">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    <strong>The architectural takeaway in one line</strong>
+                    A TSP can control <em>who gets a token</em> but not <em>what that token is used to query</em> once the MCP gateway is in the path. The enforcement boundary ends at authentication for the Hosted-MCP surface.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 8. SHIELD COVERAGE ─────────────────── -->
+    <section class="section-featured" id="shield">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-shield"></i></div>
+            <h2 class="section-title">Shield control coverage against MCP-mediated agents</h2>
+            <p class="section-lede">
+                Shield was designed around a direct-API model: every operation surfaces as an <code>ApiEvent</code>, every Shield control hangs off that. The Hosted MCP gateway introduces a new trust boundary that sits <em>above</em> that control plane.
+            </p>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Shield control</th>
+                        <th>Effective vs MCP-mediated queries?</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row-warn">
+                        <td>Event Monitoring (RTEM)</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No</span></td>
+                        <td>No <code>ApiEvent</code> generated for MCP-routed queries.</td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>Transaction Security &mdash; query-level</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No</span></td>
+                        <td>No event to evaluate; only login-level TSP retains leverage.</td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>Field Audit Trail</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No</span></td>
+                        <td>Tracks <em>writes</em> only; MCP read queries leave no trail there.</td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>Platform Encryption</td>
+                        <td><span class="status-cell is-no"><span class="status-icon"><i class="fas fa-xmark"></i></span>No</span></td>
+                        <td>Encrypts data at rest; an authenticated MCP session still gets plaintext for permitted fields.</td>
+                    </tr>
+                    <tr>
+                        <td>LoginEvent TSP</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes &mdash; binary block at auth</span></td>
+                        <td>Only Shield control with teeth against this surface &mdash; but all-or-nothing, not granular.</td>
+                    </tr>
+                    <tr>
+                        <td>EventLogFile (daily audit)</td>
+                        <td><span class="status-cell is-yes"><span class="status-icon"><i class="fas fa-check"></i></span>Yes &mdash; 24h lag</span></td>
+                        <td>Auditable after the fact via <code>ApiTotalUsage</code>; cannot drive real-time response.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="quote-box" style="margin-top: 32px;">
+                <strong>The architecturally significant finding:</strong> every Shield control that could restrict data <em>access</em> (as opposed to data <em>storage</em>) operates downstream of <code>ApiEvent</code>. Since MCP bypasses that event surface, none of them have visibility into query operations. The only Shield control with real teeth against MCP-based agents is a LoginEvent TSP &mdash; and that&rsquo;s a binary block, not granular data-level governance.
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 9. APPLY TO A SHIELD CUSTOMER ─────────────────── -->
+    <section class="section-light" id="controls">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-toolbox"></i></div>
+            <h2 class="section-title">Apply this to a Shield customer &mdash; compensating controls</h2>
+            <p class="section-lede">
+                Four practical controls a Shield customer can deploy today, in order of leverage, until Salesforce closes the real-time MCP gap (likely a dedicated <code>McpRequestEvent</code>).
+            </p>
+
+            <div class="controls-grid">
+                <div class="control-card">
+                    <div class="control-num">01</div>
+                    <h5>LoginEvent TSP on the MCP gateway IP range</h5>
+                    <p>Detect login type <code>API</code> with <code>SourceIp</code> in the Hosted-MCP gateway range (<code>3.234.75.13</code>, <code>3.211.112.171</code>). Block the session or fire an alert at authentication. <strong>Binary, immediate, the only real-time lever you have on this surface.</strong></p>
+                    <div class="control-effort"><i class="fas fa-bolt"></i> Effort: Low &middot; Latency: Real-time</div>
+                </div>
+                <div class="control-card">
+                    <div class="control-num">02</div>
+                    <h5>Nightly <code>ApiTotalUsage</code> pipeline into the SIEM</h5>
+                    <p>Pull <code>EventLogFile</code> for <code>ApiTotalUsage</code> and <code>Login</code> daily, join on <code>ConnectedAppId</code> for user attribution, land it in your SIEM. Drives detection rules with a one-day lag &mdash; better than nothing, auditable, ECA-traceable.</p>
+                    <div class="control-effort"><i class="fas fa-clock"></i> Effort: Medium &middot; Latency: ~24 hours</div>
+                </div>
+                <div class="control-card">
+                    <div class="control-num">03</div>
+                    <h5>Network egress monitoring at the MCP-gateway layer</h5>
+                    <p>If the MCP-connected app runs in your VPC or behind a forward proxy, log the outbound calls to <code>api.salesforce.com/platform/mcp/v1/…</code> at the network layer. You get request/response metadata Salesforce will not give you in <code>ApiEvent</code>.</p>
+                    <div class="control-effort"><i class="fas fa-network-wired"></i> Effort: Medium &middot; Latency: Real-time</div>
+                </div>
+                <div class="control-card">
+                    <div class="control-num">04</div>
+                    <h5>Shield Data Detect on sensitive fields</h5>
+                    <p>Layer-of-last-resort: tag PII and revenue-sensitive fields with Data Detect policies that fire on <em>any</em> access. This operates at the data classification layer and is independent of which API path the access came from.</p>
+                    <div class="control-effort"><i class="fas fa-fingerprint"></i> Effort: High &middot; Latency: Real-time</div>
+                </div>
+            </div>
+
+            <div class="callout callout-success">
+                <i class="fas fa-circle-check"></i>
+                <div>
+                    <strong>Key takeaway</strong>
+                    Agentforce gives real-time, per-operation visibility in Shield today. Headless MCP via Salesforce&rsquo;s own Hosted MCP server gives daily aggregated logs only &mdash; individual query-level audit trails do not exist yet. For customers with compliance or security-monitoring requirements, this is a gap Salesforce will need to close before Hosted MCP is production-ready in regulated environments.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────── 10. DISCUSSION ─────────────────── -->
+    <section class="section-gray" id="discussion">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-comments"></i></div>
+            <h2 class="section-title">Discussion prompts for the team</h2>
+            <p class="section-lede">
+                Five questions the team can drive on after the walkthrough.
+            </p>
+
+            <div class="prompt-list">
+                <div class="prompt-item">
+                    <div class="prompt-num">Q1</div>
+                    <div class="prompt-text">Which of our existing Shield customers are deploying MCP-connected agents today &mdash; and do they know about this visibility gap before they hit prod?</div>
+                </div>
+                <div class="prompt-item">
+                    <div class="prompt-num">Q2</div>
+                    <div class="prompt-text">Is a <strong><code>LoginEvent</code>-based TSP on the MCP gateway IPs</strong> something we&rsquo;d recommend by default for any customer running Hosted MCP? What&rsquo;s the false-positive risk?</div>
+                </div>
+                <div class="prompt-item">
+                    <div class="prompt-num">Q3</div>
+                    <div class="prompt-text">Do we have a position on whether Salesforce should ship an <code>McpRequestEvent</code> &mdash; and if so, what should be on it? Bot identity, prompt hash, tool name, user attribution?</div>
+                </div>
+                <div class="prompt-item">
+                    <div class="prompt-num">Q4</div>
+                    <div class="prompt-text">For an <strong>agent-vs-person attribution</strong> question on a write, FAT only shows the user &mdash; not the bot. Is the workaround correlating timestamps with Agentforce session tracing? Or are we waiting on richer agent metadata in FAT?</div>
+                </div>
+                <div class="prompt-item">
+                    <div class="prompt-num">Q5</div>
+                    <div class="prompt-text">Should we package the sample <code>CursorRowLimitPolicy</code> + the <code>LoginEvent</code> TSP recipe as a downloadable artifact for the field? What&rsquo;s the right channel?</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- ─────────────────── APPENDIX: ARCHITECTURE DIAGRAMS ─────────────────── -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="section-featured" id="appendix-architecture">
+        <div class="section-container">
+            <div class="section-icon"><i class="fas fa-sitemap"></i></div>
+            <h2 class="section-title">Appendix: LLM Integration Architectures</h2>
+            <p class="section-lede">
+                Two patterns for integrating external AI applications with Salesforce — and the observability trade-offs of each.
+            </p>
+
+            <!-- Current Architecture -->
+            <div class="arch-diagram-wrapper">
+                <h3 class="arch-diagram-title">
+                    <span class="arch-badge arch-badge-current">Current State</span>
+                    Direct LLM Calls — Bypasses Trust Layer
+                </h3>
+                <div class="arch-diagram">
+                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- App Container -->
+                        <rect x="200" y="20" width="400" height="100" rx="12" fill="#1a1a1a" stroke="#444" stroke-width="2"/>
+                        <text x="400" y="55" text-anchor="middle" fill="#fff" font-size="16" font-weight="600">Custom Agentic App (Node.js / Python)</text>
+                        
+                        <!-- MCP Client -->
+                        <rect x="230" y="70" width="140" height="40" rx="6" fill="#0B5CAB"/>
+                        <text x="300" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="500">MCP Client</text>
+                        
+                        <!-- LLM SDK -->
+                        <rect x="430" y="70" width="140" height="40" rx="6" fill="#6B21A8"/>
+                        <text x="500" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="500">Anthropic SDK</text>
+
+                        <!-- Arrows down -->
+                        <path d="M300 120 L300 180" stroke="#0B5CAB" stroke-width="3" marker-end="url(#arrowBlue)"/>
+                        <text x="310" y="155" fill="#666" font-size="11">SOQL via MCP</text>
+                        
+                        <path d="M500 120 L500 180" stroke="#6B21A8" stroke-width="3" marker-end="url(#arrowPurple)"/>
+                        <text x="510" y="155" fill="#666" font-size="11">Direct API</text>
+
+                        <!-- Salesforce MCP -->
+                        <rect x="180" y="190" width="240" height="90" rx="12" fill="#0176D3" stroke="#0B5CAB" stroke-width="2"/>
+                        <text x="300" y="225" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Salesforce MCP Server</text>
+                        <text x="300" y="248" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">/platform/mcp/v1/sobject-all</text>
+                        
+                        <!-- Logged indicator - batched only -->
+                        <rect x="210" y="255" width="180" height="20" rx="4" fill="#C77700"/>
+                        <text x="300" y="269" text-anchor="middle" fill="#fff" font-size="10" font-weight="500">⏱ EventLogFile (batched)</text>
+
+                        <!-- Anthropic API -->
+                        <rect x="380" y="190" width="240" height="90" rx="12" fill="#6B21A8" stroke="#7C3AED" stroke-width="2"/>
+                        <text x="500" y="225" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Anthropic API</text>
+                        <text x="500" y="248" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">api.anthropic.com</text>
+                        
+                        <!-- Not logged indicator -->
+                        <rect x="410" y="255" width="180" height="20" rx="4" fill="#DC2626"/>
+                        <text x="500" y="269" text-anchor="middle" fill="#fff" font-size="10" font-weight="500">✗ No Salesforce logging</text>
+
+                        <!-- Bottom labels -->
+                        <rect x="180" y="320" width="240" height="50" rx="8" fill="#FFF8E1" stroke="#C77700" stroke-width="1"/>
+                        <text x="300" y="345" text-anchor="middle" fill="#92400E" font-size="11" font-weight="500">Data Access: Batched Only</text>
+                        <text x="300" y="360" text-anchor="middle" fill="#666" font-size="10">EventLogFile (daily) — no ApiEvent</text>
+
+                        <rect x="380" y="320" width="240" height="50" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1"/>
+                        <text x="500" y="345" text-anchor="middle" fill="#7F1D1D" font-size="11" font-weight="500">LLM Activity: Invisible</text>
+                        <text x="500" y="360" text-anchor="middle" fill="#666" font-size="10">No Trust Layer, no audit trail</text>
+
+                        <!-- Arrow markers -->
+                        <defs>
+                            <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#0B5CAB"/>
+                            </marker>
+                            <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#6B21A8"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Proposed Architecture -->
+            <div class="arch-diagram-wrapper">
+                <h3 class="arch-diagram-title">
+                    <span class="arch-badge arch-badge-proposed">Recommended</span>
+                    Models API — Full Trust Layer Coverage
+                </h3>
+                <div class="arch-diagram">
+                    <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg">
+                        <!-- App Container -->
+                        <rect x="200" y="20" width="400" height="100" rx="12" fill="#1a1a1a" stroke="#444" stroke-width="2"/>
+                        <text x="400" y="55" text-anchor="middle" fill="#fff" font-size="16" font-weight="600">Custom Agentic App (Node.js / Python)</text>
+                        
+                        <!-- MCP Client -->
+                        <rect x="230" y="70" width="140" height="40" rx="6" fill="#0B5CAB"/>
+                        <text x="300" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="500">MCP Client</text>
+                        
+                        <!-- REST Client -->
+                        <rect x="430" y="70" width="140" height="40" rx="6" fill="#0B5CAB"/>
+                        <text x="500" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="500">REST Client</text>
+
+                        <!-- Arrows down -->
+                        <path d="M300 120 L300 180" stroke="#0B5CAB" stroke-width="3" marker-end="url(#arrowBlue2)"/>
+                        <text x="310" y="155" fill="#666" font-size="11">SOQL via MCP</text>
+                        
+                        <path d="M500 120 L500 180" stroke="#0B5CAB" stroke-width="3" marker-end="url(#arrowBlue2)"/>
+                        <text x="510" y="155" fill="#666" font-size="11">Models API</text>
+
+                        <!-- Salesforce MCP -->
+                        <rect x="180" y="190" width="240" height="80" rx="12" fill="#0176D3" stroke="#0B5CAB" stroke-width="2"/>
+                        <text x="300" y="220" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Salesforce MCP Server</text>
+                        <rect x="210" y="240" width="180" height="20" rx="4" fill="#C77700"/>
+                        <text x="300" y="254" text-anchor="middle" fill="#fff" font-size="10" font-weight="500">⏱ EventLogFile (batched)</text>
+
+                        <!-- Salesforce Models API -->
+                        <rect x="380" y="190" width="240" height="80" rx="12" fill="#0176D3" stroke="#0B5CAB" stroke-width="2"/>
+                        <text x="500" y="218" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Salesforce Models API</text>
+                        <rect x="390" y="235" width="100" height="18" rx="4" fill="#047857"/>
+                        <text x="440" y="248" text-anchor="middle" fill="#fff" font-size="9" font-weight="500">✓ EventLogFile</text>
+                        <rect x="500" y="235" width="110" height="18" rx="4" fill="#0B5CAB"/>
+                        <text x="555" y="248" text-anchor="middle" fill="#fff" font-size="9" font-weight="500">✓ ApiEvent (RT)</text>
+
+                        <!-- Arrow to Trust Layer -->
+                        <path d="M500 280 L500 320" stroke="#047857" stroke-width="3" marker-end="url(#arrowGreen)"/>
+
+                        <!-- Trust Layer -->
+                        <rect x="340" y="330" width="320" height="100" rx="12" fill="#047857" stroke="#059669" stroke-width="2"/>
+                        <text x="500" y="360" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Einstein Trust Layer</text>
+                        <text x="420" y="385" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">• Toxicity check</text>
+                        <text x="420" y="402" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">• PII masking</text>
+                        <text x="560" y="385" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">• Prompt defense</text>
+                        <text x="560" y="402" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">• STDM audit logs</text>
+
+                        <!-- Arrow to LLM -->
+                        <path d="M500 440 L500 470" stroke="#047857" stroke-width="3" marker-end="url(#arrowGreen)"/>
+
+                        <!-- LLM Provider -->
+                        <rect x="380" y="480" width="240" height="35" rx="8" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+                        <text x="500" y="503" text-anchor="middle" fill="#fff" font-size="12">LLM Provider (via Salesforce)</text>
+
+                        <!-- Data Cloud callout -->
+                        <rect x="680" y="330" width="110" height="100" rx="8" fill="#E5F2FF" stroke="#0176D3" stroke-width="1"/>
+                        <text x="735" y="355" text-anchor="middle" fill="#032D60" font-size="10" font-weight="600">Data Cloud</text>
+                        <text x="735" y="372" text-anchor="middle" fill="#666" font-size="9">GenAIGateway</text>
+                        <text x="735" y="386" text-anchor="middle" fill="#666" font-size="9">GenAIGeneration</text>
+                        <text x="735" y="400" text-anchor="middle" fill="#666" font-size="9">GenAIContent</text>
+                        <text x="735" y="414" text-anchor="middle" fill="#666" font-size="9">Quality__dlm</text>
+                        <path d="M660 380 L675 380" stroke="#0176D3" stroke-width="2" stroke-dasharray="4"/>
+
+                        <defs>
+                            <marker id="arrowBlue2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#0B5CAB"/>
+                            </marker>
+                            <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#047857"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Summary comparison -->
+            <div class="arch-comparison">
+                <div class="arch-comparison-item arch-comparison-current">
+                    <h4><i class="fas fa-times-circle"></i> Direct LLM + MCP</h4>
+                    <ul>
+                        <li>MCP: EventLogFile only (batched, no ApiEvent)</li>
+                        <li>LLM: Completely invisible to Salesforce</li>
+                        <li>No Trust Layer protection</li>
+                        <li>Lower latency (~100-200ms saved)</li>
+                    </ul>
+                </div>
+                <div class="arch-comparison-item arch-comparison-proposed">
+                    <h4><i class="fas fa-check-circle"></i> Models API + MCP</h4>
+                    <ul>
+                        <li>LLM: Real-time ApiEvent + STDM audit</li>
+                        <li>MCP: Still batched (EventLogFile)</li>
+                        <li>Trust Layer safety guardrails</li>
+                        <li>Adds ~100-200ms latency to LLM calls</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <style>
+        .arch-diagram-wrapper {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .arch-diagram-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .arch-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .arch-badge-current {
+            background: var(--amber-50);
+            color: var(--amber-600);
+            border: 1px solid var(--amber-600);
+        }
+        .arch-badge-proposed {
+            background: var(--green-50);
+            color: var(--green-600);
+            border: 1px solid var(--green-600);
+        }
+        .arch-diagram {
+            background: var(--gray-100);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+        }
+        .arch-diagram svg {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .arch-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .arch-comparison-item {
+            padding: 24px;
+            border-radius: 12px;
+        }
+        .arch-comparison-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .arch-comparison-item ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .arch-comparison-item li {
+            padding: 8px 0;
+            font-size: 0.95rem;
+            color: var(--gray-700);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .arch-comparison-item li:last-child { border-bottom: none; }
+        .arch-comparison-current {
+            background: var(--red-50);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+        .arch-comparison-current h4 { color: var(--red-600); }
+        .arch-comparison-proposed {
+            background: var(--green-50);
+            border: 1px solid rgba(4, 120, 87, 0.2);
+        }
+        .arch-comparison-proposed h4 { color: var(--green-600); }
+    </style>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <h4>The Governance Gradient &middot; Shield Observability POC</h4>
+                    <p>Internal team walkthrough &middot; Spring &rsquo;26</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built for live presentation &middot; Sources: <em>Capstone (1).docx</em>, Streaming Event Monitor LWC, Rachel/Gary onboarding chat (2026-05-22)</p>
+            </div>
+        </div>
+    </footer>
+
+    </div><!-- end content-wrapper -->
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenuBtn.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+            });
+            document.querySelectorAll('.mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenuBtn.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // Generic stepper initializer - works for all steppers
+        function initStepper(stepperId, deckId, fillId, prevBtnId, nextBtnId, counterId) {
+            const stepper = document.getElementById(stepperId);
+            const fill = document.getElementById(fillId);
+            const deck = document.getElementById(deckId);
+            const prevBtn = prevBtnId ? document.getElementById(prevBtnId) : null;
+            const nextBtn = nextBtnId ? document.getElementById(nextBtnId) : null;
+            const counter = counterId ? document.getElementById(counterId) : null;
+            if (!stepper || !deck) return null;
+
+            const buttons = Array.from(stepper.querySelectorAll('.stepper-btn'));
+            const slides = Array.from(deck.querySelectorAll('.flow-slide'));
+            const total = buttons.length;
+            let current = 1;
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function render() {
+                buttons.forEach(btn => {
+                    const step = parseInt(btn.dataset.step, 10);
+                    btn.classList.toggle('is-active', step === current);
+                    btn.classList.toggle('is-done', step < current);
+                    btn.setAttribute('aria-selected', step === current ? 'true' : 'false');
+                });
+                slides.forEach(slide => {
+                    const step = parseInt(slide.dataset.step, 10);
+                    slide.classList.toggle('is-active', step === current);
+                });
+                if (fill) {
+                    const pct = total > 1 ? ((current - 1) / (total - 1)) * 100 : 0;
+                    fill.style.width = pct + '%';
+                }
+                if (counter) counter.textContent = pad(current);
+                if (prevBtn) prevBtn.disabled = current === 1;
+                if (nextBtn) {
+                    nextBtn.disabled = current === total;
+                    nextBtn.innerHTML = current === total
+                        ? 'Done <i class="fas fa-check"></i>'
+                        : 'Next <i class="fas fa-chevron-right"></i>';
+                }
+            }
+
+            function go(step) {
+                if (step < 1 || step > total || step === current) return;
+                current = step;
+                render();
+            }
+
+            buttons.forEach(btn => btn.addEventListener('click', () => go(parseInt(btn.dataset.step, 10))));
+            if (prevBtn) prevBtn.addEventListener('click', () => go(current - 1));
+            if (nextBtn) nextBtn.addEventListener('click', () => go(current + 1));
+
+            render();
+            return { go, stepper, total };
+        }
+
+        // Initialize all L1-L4 steppers (with data-stepper controls)
+        ['l1', 'l2', 'l3', 'l4'].forEach(id => {
+            const stepperId = id + 'Stepper';
+            const deckId = id + 'Deck';
+            const fillId = id + 'StepperFill';
+            const stepper = document.getElementById(stepperId);
+            const deck = document.getElementById(deckId);
+            const fill = document.getElementById(fillId);
+            if (!stepper || !deck) return;
+
+            const buttons = Array.from(stepper.querySelectorAll('.stepper-btn'));
+            const slides = Array.from(deck.querySelectorAll('.flow-slide'));
+            const counter = document.querySelector('.flow-current[data-stepper="' + id + '"]');
+            const total = buttons.length;
+            let current = 1;
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+            function render() {
+                buttons.forEach(btn => {
+                    const step = parseInt(btn.dataset.step, 10);
+                    btn.classList.toggle('is-active', step === current);
+                    btn.classList.toggle('is-done', step < current);
+                });
+                slides.forEach(slide => {
+                    slide.classList.toggle('is-active', parseInt(slide.dataset.step, 10) === current);
+                });
+                if (fill) fill.style.width = ((current - 1) / (total - 1)) * 100 + '%';
+                if (counter) counter.textContent = pad(current);
+            }
+            function go(step) {
+                if (step < 1 || step > total) return;
+                current = step;
+                render();
+            }
+            buttons.forEach(btn => btn.addEventListener('click', () => go(parseInt(btn.dataset.step, 10))));
+            document.querySelectorAll('[data-stepper="' + id + '"]').forEach(btn => {
+                if (btn.dataset.dir === 'prev') btn.addEventListener('click', () => go(current - 1));
+                if (btn.dataset.dir === 'next') btn.addEventListener('click', () => go(current + 1));
+            });
+            render();
+        });
+
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": isMobile ? 50 : 120, "density": { "enable": true, "value_area": isMobile ? 500 : 700 } },
+                "color": { "value": ["#57A3FD", "#1B96FF", "#E5F2FF", "#ffffff"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.8, "random": true, "anim": { "enable": !isMobile, "speed": 1, "opacity_min": 0.2, "sync": false } },
+                "size": { "value": isMobile ? 4 : 5, "random": true, "anim": { "enable": !isMobile, "speed": 2, "size_min": 0.8, "sync": false } },
+                "line_linked": { "enable": true, "distance": isMobile ? 120 : 150, "color": "#57A3FD", "opacity": isMobile ? 0.3 : 0.5, "width": 1 },
+                "move": { "enable": true, "speed": isMobile ? 1 : 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "window",
+                "events": {
+                    "onhover": { "enable": true, "mode": ["grab", "bubble"] },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 200, "line_linked": { "opacity": 1 } },
+                    "bubble": { "distance": 200, "size": 10, "duration": 0.3, "opacity": 1, "speed": 3 },
+                    "repulse": { "distance": 150, "duration": 0.4 },
+                    "push": { "particles_nb": isMobile ? 3 : 6 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>
