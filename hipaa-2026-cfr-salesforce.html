@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HIPAA 2026 · CFR → Salesforce Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ── Base / tokens (Quince-inspired, from Agentforce Today remodel) ─────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #faf8f5;
+    --bg-white:    #ffffff;
+    --border:      rgba(139, 115, 85, 0.12);
+    --border-md:   rgba(139, 115, 85, 0.18);
+    --text-1:      #2d2a26;
+    --text-2:      #5c564e;
+    --text-3:      #9a938a;
+    --accent:      #c75b2e;
+    --accent-dark: #a84a24;
+    --radius-sm:   7px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-xl:   20px;
+    font-size: 14px;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-brand: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(255, 210, 160, 0.25), transparent 60%),
+      radial-gradient(1000px 520px at -10% 5%, rgba(180, 200, 255, 0.16), transparent 55%),
+      var(--bg);
+    color: var(--text-1);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse  { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* ── Header ─────────────────────────────────────────────────────────────── */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 32px; height: 60px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { display: flex; align-items: center; gap: 11px; }
+  .logo-mark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(199, 91, 46, 0.3);
+  }
+  .logo-text { display: flex; flex-direction: column; line-height: 1.05; }
+  .logo-name { font-size: 10px; font-weight: 800; letter-spacing: .12em; color: var(--text-3); text-transform: uppercase; }
+  .logo-today { font-size: 17px; font-weight: 500; color: var(--text-1); font-family: var(--font-brand); font-style: italic; }
+  .header-sep { width: 1px; height: 26px; background: var(--border-md); }
+  .header-nav { font-size: 13px; font-weight: 600; color: var(--text-2); }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    padding: 5px 12px; border-radius: 20px;
+    background: #e8ebe5; color: #6b7c5e; border: 1px solid #c5d4b8;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+  .header-date { font-size: 11.5px; font-weight: 700; letter-spacing: .05em; color: var(--text-2); text-transform: uppercase; }
+
+  /* ── Shell ──────────────────────────────────────────────────────────────── */
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 32px 72px; }
+
+  /* ── Hero ───────────────────────────────────────────────────────────────── */
+  .hero { animation: fadeUp .5s ease both; }
+  .hero-label {
+    font-size: 11px; font-weight: 800; letter-spacing: .14em;
+    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 14px;
+  }
+  .hero-title {
+    font-size: 46px; font-weight: 400; color: var(--text-1);
+    font-family: var(--font-brand); line-height: 1.12; letter-spacing: -.01em;
+    max-width: 900px;
+  }
+  .hero-title em { color: var(--accent); font-style: italic; }
+  .hero-subtitle {
+    font-size: 15px; color: var(--text-2); line-height: 1.7;
+    margin-top: 18px; max-width: 720px;
+  }
+
+  /* ── Mandate stat tiles ─────────────────────────────────────────────────── */
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-top: 34px;
+  }
+  .stat-tile {
+    position: relative; overflow: hidden;
+    background: var(--bg-white); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.06);
+    animation: fadeUp .5s ease both;
+  }
+  .stat-tile::before {
+    content: ''; position: absolute; border-radius: 50%; pointer-events: none;
+    filter: blur(34px); width: 130px; height: 90px; top: -34px; left: -18px; z-index: 0;
+  }
+  .stat-tile:nth-child(1)::before { background: radial-gradient(ellipse, rgba(255,180,130,.55), rgba(255,210,160,.3) 50%, transparent 70%); }
+  .stat-tile:nth-child(2)::before { background: radial-gradient(ellipse, rgba(255,220,100,.5), rgba(255,200,120,.3) 50%, transparent 70%); }
+  .stat-tile:nth-child(3)::before { background: radial-gradient(ellipse, rgba(180,200,255,.5), rgba(200,180,240,.3) 50%, transparent 70%); }
+  .stat-tile:nth-child(4)::before { background: radial-gradient(ellipse, rgba(255,150,120,.5), rgba(255,180,150,.3) 50%, transparent 70%); }
+  .stat-tile > * { position: relative; z-index: 1; }
+  .stat-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; color: var(--text-3); text-transform: uppercase; }
+  .stat-value { font-size: 27px; font-weight: 700; color: var(--text-1); line-height: 1.1; margin-top: 8px; letter-spacing: -.02em; }
+  .stat-sub { font-size: 11.5px; font-weight: 600; color: var(--text-2); margin-top: 6px; }
+
+  /* ── Section head ───────────────────────────────────────────────────────── */
+  .section-head { margin: 54px 0 20px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .section-title { font-size: 26px; font-weight: 500; font-family: var(--font-brand); color: var(--text-1); }
+  .section-title em { font-style: italic; color: var(--accent); }
+  .section-hint {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 600; color: var(--text-3);
+    background: var(--bg-white); border: 1px solid var(--border-md);
+    padding: 7px 13px; border-radius: 20px;
+  }
+  .section-hint svg { width: 15px; height: 15px; }
+
+  /* ── CFR card grid ──────────────────────────────────────────────────────── */
+  .cfr-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;
+  }
+
+  .cfr-card {
+    --c: var(--accent);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px rgba(139,115,85,.08), 0 6px 16px rgba(139,115,85,.07);
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    animation: fadeUp .5s ease both;
+  }
+  /* watercolor wash */
+  .cfr-card::after {
+    content: ''; position: absolute; z-index: 0; pointer-events: none;
+    width: 150px; height: 105px; top: -34px; left: -18px; border-radius: 50%;
+    filter: blur(30px);
+    background: radial-gradient(ellipse, color-mix(in srgb, var(--c) 34%, transparent), transparent 70%);
+  }
+  .cfr-card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--c) 32%, transparent);
+    box-shadow: 0 10px 22px rgba(139,115,85,.14), 0 22px 48px rgba(139,115,85,.12);
+  }
+  .cfr-bar { height: 4px; width: 100%; background: var(--c); position: relative; z-index: 1; }
+
+  .cfr-head { display: flex; align-items: center; gap: 13px; padding: 18px 22px 0; position: relative; z-index: 1; }
+  .cfr-icon {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--c) 13%, #fff);
+    color: var(--c);
+  }
+  .cfr-icon svg { width: 24px; height: 24px; }
+  .cfr-code { font-size: 15px; font-weight: 800; color: var(--text-1); letter-spacing: -.01em; }
+  .cfr-tag {
+    font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--c); margin-top: 3px;
+  }
+
+  .cfr-body { padding: 14px 22px 20px; position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; }
+  .cfr-name { font-size: 20px; font-weight: 600; font-family: var(--font-brand); color: var(--text-1); line-height: 1.3; }
+  .cfr-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-top: 9px; }
+
+  .cfr-reveal-hint {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+    color: var(--text-3); margin-top: 16px;
+    transition: opacity .2s ease;
+  }
+  .cfr-reveal-hint svg { width: 13px; height: 13px; }
+  .cfr-card:hover .cfr-reveal-hint,
+  .cfr-card:focus-within .cfr-reveal-hint { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+
+  /* Hover-reveal solutions */
+  .cfr-solutions {
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease, margin-top .42s ease;
+  }
+  .cfr-card:hover .cfr-solutions,
+  .cfr-card:focus-within .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+
+  .cfr-solutions-label {
+    font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); padding-top: 14px; margin-bottom: 4px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cfr-solutions-label b { color: var(--c); font-weight: 800; }
+
+  .sol {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 0;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .cfr-card:hover .sol,
+  .cfr-card:focus-within .sol { opacity: 1; transform: none; }
+  .sol + .sol { border-top: 1px solid var(--border); }
+
+  .sol-icon {
+    width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--sc) 14%, #fff);
+    color: var(--sc);
+    border: 1px solid color-mix(in srgb, var(--sc) 22%, transparent);
+  }
+  .sol-icon svg { width: 20px; height: 20px; }
+  .sol-text { display: flex; flex-direction: column; min-width: 0; }
+  .sol-name { font-size: 13px; font-weight: 700; color: var(--text-1); }
+  .sol-desc { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+
+  /* ── Footer ─────────────────────────────────────────────────────────────── */
+  .footer {
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border);
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .footer-note { font-size: 11.5px; color: var(--text-3); line-height: 1.6; max-width: 720px; }
+  .footer-note b { color: var(--text-2); font-weight: 700; }
+  .footer-brand { font-size: 12px; font-weight: 700; color: var(--text-2); font-family: var(--font-brand); font-style: italic; }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 1100px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) {
+    .wrap { padding: 28px 18px 56px; }
+    .header { padding: 0 18px; }
+    .header-nav, .header-date { display: none; }
+    .hero-title { font-size: 34px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .cfr-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">Salesforce</span>
+        <span class="logo-today">Compliance</span>
+      </div>
+    </div>
+    <div class="header-sep"></div>
+    <span class="header-nav">HIPAA Security Rule · Modernized 2026</span>
+    <div class="header-right">
+      <span class="live-badge"><span class="live-dot"></span>Active Resilience</span>
+      <span class="header-date">45 CFR · Title 45</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Hero -->
+    <section class="hero">
+      <span class="hero-label">Modernization of the HIPAA Security Rule · 2026</span>
+      <h1 class="hero-title">From check-the-box compliance to <em>Active Resilience.</em></h1>
+      <p class="hero-subtitle">
+        In 2026, federal auditors interpret HIPAA through the lens of NIST CSF 2.0 &mdash; Identify, Protect, Detect,
+        Respond, Recover. "Addressable" safeguards are now the expected legal standard: annual risk assessments,
+        mandatory MFA, AES-256 encryption, and 72-hour recovery. Below, each section of the Code of Federal
+        Regulations is mapped to the Salesforce controls that satisfy it. <strong>Hover a card</strong> to reveal the solutions.
+      </p>
+
+      <div class="stat-grid">
+        <div class="stat-tile" style="animation-delay:.05s">
+          <div class="stat-label">Access</div>
+          <div class="stat-value">MFA Required</div>
+          <div class="stat-sub">Now mandatory, no longer "addressable"</div>
+        </div>
+        <div class="stat-tile" style="animation-delay:.1s">
+          <div class="stat-label">Encryption</div>
+          <div class="stat-value">AES-256</div>
+          <div class="stat-sub">ePHI at rest &amp; in transit &middot; EKM</div>
+        </div>
+        <div class="stat-tile" style="animation-delay:.15s">
+          <div class="stat-label">Ransomware</div>
+          <div class="stat-value">72-Hour RTO</div>
+          <div class="stat-sub">Restore critical systems &middot; 48h RPO</div>
+        </div>
+        <div class="stat-tile" style="animation-delay:.2s">
+          <div class="stat-label">Retention</div>
+          <div class="stat-value">6+ Years</div>
+          <div class="stat-sub">Immutable, reconstructable records</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CFR section -->
+    <div class="section-head">
+      <h2 class="section-title">The <em>CFR</em>, mapped to Salesforce security</h2>
+      <span class="section-hint">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
+        Hover any regulation to reveal its controls
+      </span>
+    </div>
+
+    <div class="cfr-grid" id="cfrGrid"></div>
+
+    <footer class="footer">
+      <p class="footer-note">
+        <b>Sources:</b> Modernization of the HIPAA Security Rule (internal, 2026); Salesforce Life Sciences Security &mdash; Securing MCP Connectors &amp; APIs (June 2026).
+        Regulatory context: HHS OCR HIPAA Security Rule NPRM (RIN 0945-AA22, published Jan 6, 2025). Note: the NPRM remains
+        <b>pending</b> as of mid-2026 and the current Security Rule remains in effect &mdash; the mandates shown reflect the modernized interpretation and recognized security practices.
+      </p>
+      <span class="footer-brand">Salesforce Compliance</span>
+    </footer>
+  </main>
+
+<script>
+  /* ── Flat-design solution icons (stroke = currentColor) ─────────────────── */
+  const ICON = {
+    identity: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M5.4 16.2c.5-1.8 2-2.9 3.6-2.9s3.1 1.1 3.6 2.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15 9.5h4M15 12h4M15 14.5h2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    securityCenter: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    dataDetect: '<svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M15 15l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 10h5M8 12.4h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    eventMonitoring: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M6 11h2.4l1.5-3.2 2.1 5 1.5-3H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 20h6M12 17v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    encryption: '<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7.5a4 4 0 018 0V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="14.5" r="1.4" fill="currentColor"/><path d="M12 15.6V17.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    auditTrail: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 108-8 8 8 0 00-6.6 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v3.6h3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8.4V12l2.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    backup: '<svg viewBox="0 0 24 24" fill="none"><path d="M7.5 16.5A4 4 0 016.8 8.6a5 5 0 019.7-.6A3.6 3.6 0 0117.5 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.5 15.5L12 18l2.5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    privacy: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 12s3-5.5 8-5.5c1.4 0 2.7.4 3.8 1.1M20 12s-3 5.5-8 5.5c-1.5 0-2.8-.4-4-1.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    connectedApp: '<svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M10.9 10.9l8 8M16 16l1.8-1.8M18.3 18.3l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    namedCred: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M12 9.6V8.4M12 12l1.9 1.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+  };
+
+  /* ── Solution catalog ───────────────────────────────────────────────────── */
+  const SOL = {
+    identity:        { name: 'Customer Identity',        desc: 'MFA &amp; adaptive access control',      color: '#3a7bd5', icon: ICON.identity },
+    securityCenter:  { name: 'Security Center',          desc: 'Tenant-wide posture &amp; config drift', color: '#2e9e6b', icon: ICON.securityCenter },
+    dataDetect:      { name: 'Shield: Data Detect',      desc: 'Finds hidden PHI in free text',          color: '#c75b2e', icon: ICON.dataDetect },
+    eventMonitoring: { name: 'Shield: Event Monitoring', desc: 'Per-event forensic activity logs',       color: '#7b5ea7', icon: ICON.eventMonitoring },
+    encryption:      { name: 'Shield: Platform Encryption', desc: 'AES-256 ePHI at rest &middot; EKM',   color: '#b8893b', icon: ICON.encryption },
+    auditTrail:      { name: 'Shield: Field Audit Trail', desc: 'Indefinite field-level history',        color: '#5e8c8c', icon: ICON.auditTrail },
+    backup:          { name: 'Salesforce Backup',        desc: 'Point-in-time recovery',                 color: '#4a90d9', icon: ICON.backup },
+    privacy:         { name: 'Privacy Center',           desc: 'Consent &amp; data-use policies',        color: '#9a7b9e', icon: ICON.privacy },
+    connectedApp:    { name: 'Connected Apps (JWT)',     desc: 'Per-agent scoped OAuth',                 color: '#d97a2e', icon: ICON.connectedApp },
+    namedCred:       { name: 'Named Credentials',        desc: 'Vaulted, rotated secrets',               color: '#6b7c5e', icon: ICON.namedCred }
+  };
+
+  /* ── CFR regulation cards (pages 8-10 of HIPAA Rules + MCP/API deck) ─────── */
+  const CFR = [
+    {
+      code: '45 CFR §164.308', tag: 'Administrative Safeguards', color: '#6b7c5e',
+      icon: ICON.securityCenter,
+      name: 'Administrative Safeguards',
+      desc: 'Implement policies and procedures to prevent, detect, contain, and correct security violations. 2026 raises the floor with mandatory annual risk analysis and workforce MFA.',
+      sols: ['identity', 'securityCenter', 'dataDetect', 'eventMonitoring']
+    },
+    {
+      code: '45 CFR §164.310', tag: 'Physical Safeguards', color: '#8b7355',
+      icon: ICON.identity,
+      name: 'Physical Safeguards',
+      desc: 'Protect electronic information systems and related equipment from hazards and unauthorized intrusion &mdash; enforced through platform access, device, and configuration controls.',
+      sols: ['securityCenter', 'eventMonitoring', 'identity']
+    },
+    {
+      code: '45 CFR §164.312', tag: 'Technical Safeguards', color: '#c75b2e',
+      icon: ICON.encryption,
+      name: 'Technical Safeguards',
+      desc: 'Implement technology and policies to protect and control access to ePHI. In 2026, encryption at rest and in transit moves from "addressable" to required.',
+      sols: ['encryption', 'identity', 'eventMonitoring', 'securityCenter']
+    },
+    {
+      code: '45 CFR §164.316', tag: 'Documentation &amp; Retention', color: '#7a8f6e',
+      icon: ICON.auditTrail,
+      name: 'Documentation &amp; Retention',
+      desc: 'Retain all HIPAA policies, procedures, and audit records for a minimum of six years &mdash; with an immutable history that can reconstruct clinical data timelines during an investigation.',
+      sols: ['auditTrail', 'backup', 'securityCenter']
+    },
+    {
+      code: '45 CFR §164.400-414', tag: 'Breach Notification', color: '#a84a24',
+      icon: ICON.eventMonitoring,
+      name: 'Breach Notification',
+      desc: 'When a breach occurs, notify affected individuals and the HHS Secretary. Without a log from Event Monitoring you are interpreted as being in "willful neglect" &mdash; regardless of a signed BAA.',
+      sols: ['eventMonitoring', 'backup', 'securityCenter']
+    },
+    {
+      code: '45 CFR §164.520', tag: 'Notice of Privacy Practices', color: '#9a7b9e',
+      icon: ICON.privacy,
+      name: 'Notice of Privacy Practices',
+      desc: 'Govern how patient data is shared and disclosed. New NPP obligations follow the alignment of substance-use data with HIPAA, effective February 16, 2026.',
+      sols: ['privacy', 'dataDetect', 'securityCenter']
+    },
+    {
+      code: '42 CFR Part 2', tag: 'SUD Data Protection', color: '#5e8c8c',
+      icon: ICON.dataDetect,
+      name: 'Substance-Use Disorder Data',
+      desc: 'Specialized safeguards for substance-use-disorder records, officially aligned with HIPAA on February 16, 2026 with stricter consent and minimum-necessary sharing.',
+      sols: ['privacy', 'encryption', 'identity', 'dataDetect']
+    },
+    {
+      code: '21 CFR Part 11', tag: 'API &amp; MCP Traceability', color: '#b8893b',
+      icon: ICON.connectedApp,
+      name: 'Electronic Records &amp; API Access',
+      desc: 'ALCOA+ integrity for every API and MCP-server call touching regulated records &mdash; attributable, contemporaneous, immutable logs across REST, SOQL, Bulk, and Composite.',
+      sols: ['connectedApp', 'namedCred', 'eventMonitoring', 'securityCenter']
+    }
+  ];
+
+  /* ── Render ─────────────────────────────────────────────────────────────── */
+  const grid = document.getElementById('cfrGrid');
+  grid.innerHTML = CFR.map((r, i) => {
+    const sols = r.sols.map((k, j) => {
+      const s = SOL[k];
+      return `<div class="sol" style="--sc:${s.color}; transition-delay:${0.05 + j * 0.06}s">
+                <div class="sol-icon">${s.icon}</div>
+                <div class="sol-text">
+                  <span class="sol-name">${s.name}</span>
+                  <span class="sol-desc">${s.desc}</span>
+                </div>
+              </div>`;
+    }).join('');
+    return `
+      <article class="cfr-card" tabindex="0" style="--c:${r.color}; animation-delay:${0.08 + i * 0.05}s">
+        <div class="cfr-bar"></div>
+        <div class="cfr-head">
+          <div class="cfr-icon">${r.icon}</div>
+          <div>
+            <div class="cfr-code">${r.code}</div>
+            <div class="cfr-tag">${r.tag}</div>
+          </div>
+        </div>
+        <div class="cfr-body">
+          <h3 class="cfr-name">${r.name}</h3>
+          <p class="cfr-desc">${r.desc}</p>
+          <span class="cfr-reveal-hint">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Hover for Salesforce controls
+          </span>
+          <div class="cfr-solutions">
+            <div class="cfr-solutions-label">Salesforce security &rarr; <b>${r.sols.length} controls</b></div>
+            ${sols}
+          </div>
+        </div>
+      </article>`;
+  }).join('');
+</script>
+</body>
+</html>
