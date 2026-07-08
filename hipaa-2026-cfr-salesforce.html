@@ -155,11 +155,20 @@
     filter: blur(30px);
     background: radial-gradient(ellipse, color-mix(in srgb, var(--c) 34%, transparent), transparent 70%);
   }
-  .cfr-card:hover {
+  .cfr-card.is-open {
     transform: translateY(-5px);
     border-color: color-mix(in srgb, var(--c) 32%, transparent);
     box-shadow: 0 10px 22px rgba(139,115,85,.14), 0 22px 48px rgba(139,115,85,.12);
   }
+  @media (hover: hover) {
+    .cfr-card:hover {
+      transform: translateY(-5px);
+      border-color: color-mix(in srgb, var(--c) 32%, transparent);
+      box-shadow: 0 10px 22px rgba(139,115,85,.14), 0 22px 48px rgba(139,115,85,.12);
+    }
+  }
+  /* Tap affordance on touch devices */
+  @media (hover: none) { .cfr-card { cursor: pointer; -webkit-tap-highlight-color: transparent; } }
   .cfr-bar { height: 4px; width: 100%; background: var(--c); position: relative; z-index: 1; }
 
   .cfr-head { display: flex; align-items: center; gap: 13px; padding: 18px 22px 0; position: relative; z-index: 1; }
@@ -187,16 +196,22 @@
     transition: opacity .2s ease;
   }
   .cfr-reveal-hint svg { width: 13px; height: 13px; }
-  .cfr-card:hover .cfr-reveal-hint,
-  .cfr-card:focus-within .cfr-reveal-hint { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+  .cfr-card.is-open .cfr-reveal-hint { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+  @media (hover: hover) {
+    .cfr-card:hover .cfr-reveal-hint,
+    .cfr-card:focus-within .cfr-reveal-hint { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+  }
 
   /* Hover-reveal solutions */
   .cfr-solutions {
     max-height: 0; opacity: 0; overflow: hidden;
     transition: max-height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease, margin-top .42s ease;
   }
-  .cfr-card:hover .cfr-solutions,
-  .cfr-card:focus-within .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+  .cfr-card.is-open .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+  @media (hover: hover) {
+    .cfr-card:hover .cfr-solutions,
+    .cfr-card:focus-within .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+  }
 
   .cfr-solutions-label {
     font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
@@ -212,8 +227,11 @@
     opacity: 0; transform: translateY(10px);
     transition: opacity .35s ease, transform .35s ease;
   }
-  .cfr-card:hover .sol,
-  .cfr-card:focus-within .sol { opacity: 1; transform: none; }
+  .cfr-card.is-open .sol { opacity: 1; transform: none; }
+  @media (hover: hover) {
+    .cfr-card:hover .sol,
+    .cfr-card:focus-within .sol { opacity: 1; transform: none; }
+  }
   .sol + .sol { border-top: 1px solid var(--border); }
 
   .sol-icon {
@@ -454,6 +472,29 @@
         </div>
       </article>`;
   }).join('');
+
+  /* ── Touch: tap-to-toggle with accordion (desktop keeps pure CSS hover) ──── */
+  const isTouch = window.matchMedia('(hover: none)').matches;
+  if (isTouch) {
+    document.querySelectorAll('.cfr-card').forEach(card => {
+      const hint = card.querySelector('.cfr-reveal-hint');
+      if (hint && hint.lastChild) hint.lastChild.textContent = ' Tap for Salesforce controls';
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-expanded', 'false');
+      const toggle = () => {
+        const willOpen = !card.classList.contains('is-open');
+        document.querySelectorAll('.cfr-card.is-open').forEach(c => {
+          if (c !== card) { c.classList.remove('is-open'); c.setAttribute('aria-expanded', 'false'); }
+        });
+        card.classList.toggle('is-open', willOpen);
+        card.setAttribute('aria-expanded', String(willOpen));
+      };
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  }
 </script>
 </body>
 </html>
