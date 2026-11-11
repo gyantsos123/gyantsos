@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HIPAA 2026 · CFR → Salesforce Security</title>
+<title>HIPAA Security Rule proposal · July 2027 · Salesforce</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -70,9 +70,8 @@
     display: flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 800; letter-spacing: .08em;
     padding: 5px 12px; border-radius: 20px;
-    background: #e8ebe5; color: #6b7c5e; border: 1px solid #c5d4b8;
+    background: #f8efe4; color: #8a4b12; border: 1px solid #ead7c4;
   }
-  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
   .header-date { font-size: 11.5px; font-weight: 700; letter-spacing: .05em; color: var(--text-2); text-transform: uppercase; }
 
   /* ── Shell ──────────────────────────────────────────────────────────────── */
@@ -207,10 +206,10 @@
     max-height: 0; opacity: 0; overflow: hidden;
     transition: max-height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease, margin-top .42s ease;
   }
-  .cfr-card.is-open .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+  .cfr-card.is-open .cfr-solutions { max-height: 860px; opacity: 1; margin-top: 16px; }
   @media (hover: hover) {
     .cfr-card:hover .cfr-solutions,
-    .cfr-card:focus-within .cfr-solutions { max-height: 520px; opacity: 1; margin-top: 16px; }
+    .cfr-card:focus-within .cfr-solutions { max-height: 860px; opacity: 1; margin-top: 16px; }
   }
 
   .cfr-solutions-label {
@@ -244,7 +243,39 @@
   .sol-icon svg { width: 20px; height: 20px; }
   .sol-text { display: flex; flex-direction: column; min-width: 0; }
   .sol-name { font-size: 13px; font-weight: 700; color: var(--text-1); }
-  .sol-desc { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+  .sol-desc { font-size: 11.5px; color: var(--text-2); margin-top: 1px; line-height: 1.45; }
+  .tier-label {
+    font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    margin: 10px 0 2px;
+  }
+  .tier-label.platform { color: #3d5a80; }
+  .tier-label.included { color: #2e6b4f; }
+  .tier-label.addon { color: #8a4b12; }
+
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; }
+  .legend span {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 99px; background: var(--bg-white); border: 1px solid var(--border-md);
+  }
+  .legend .platform { color: #3d5a80; }
+  .legend .included { color: #2e6b4f; }
+  .legend .addon { color: #8a4b12; }
+
+  .gap {
+    margin-top: 28px;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px 10px;
+  }
+  .gap h2 { font-family: var(--font-brand); font-size: 22px; font-weight: 500; }
+  .gap h2 em { font-style: italic; color: var(--accent); }
+  .gap-lead { font-size: 13px; color: var(--text-2); line-height: 1.65; margin: 8px 0 14px; max-width: 780px; }
+  .gap ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px; margin-bottom: 14px; }
+  .gap li { font-size: 12.5px; color: var(--text-2); line-height: 1.55; padding-left: 14px; position: relative; }
+  .gap li::before {
+    content: ''; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   /* ── Footer ─────────────────────────────────────────────────────────────── */
   .footer {
@@ -263,7 +294,7 @@
     .header-nav, .header-date { display: none; }
     .hero-title { font-size: 34px; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
-    .cfr-grid { grid-template-columns: 1fr; }
+    .cfr-grid, .gap ul { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -278,71 +309,90 @@
       </div>
       <div class="logo-text">
         <span class="logo-name">Salesforce</span>
-        <span class="logo-today">Compliance</span>
+        <span class="logo-today">Briefing</span>
       </div>
     </div>
     <div class="header-sep"></div>
-    <span class="header-nav">HIPAA Security Rule · Modernized 2026</span>
+    <span class="header-nav">HIPAA Security Rule proposal</span>
     <div class="header-right">
-      <span class="live-badge"><span class="live-dot"></span>Active Resilience</span>
-      <span class="header-date">45 CFR · Title 45</span>
+      <span class="live-badge">Proposal · not in force</span>
+      <span class="header-date">July 2027 target</span>
     </div>
   </header>
 
   <main class="wrap">
     <!-- Hero -->
     <section class="hero">
-      <span class="hero-label">Modernization of the HIPAA Security Rule · 2026</span>
-      <h1 class="hero-title">From check-the-box compliance to <em>Active Resilience.</em></h1>
+      <span class="hero-label">HIPAA Security Rule proposal · not in force</span>
+      <h1 class="hero-title">What's on the table for <em>July 2027.</em></h1>
       <p class="hero-subtitle">
-        In 2026, federal auditors interpret HIPAA through the lens of NIST CSF 2.0 &mdash; Identify, Protect, Detect,
-        Respond, Recover. "Addressable" safeguards are now the expected legal standard: annual risk assessments,
-        mandatory MFA, AES-256 encryption, and 72-hour recovery. Below, each section of the Code of Federal
-        Regulations is mapped to the Salesforce controls that satisfy it. <strong>Hover a card</strong> to reveal the solutions.
+        HHS published this proposal on January 6, 2025. The regulatory agenda targets final action in July 2027.
+        That date is a planning target. It is not an effective date, and it is not a compliance date. The Security Rule
+        in force today is unchanged. If a final rule is published, an effective date follows publication, and the
+        compliance period generally cannot be shorter than 180 days. Specifications that are addressable today would
+        become required, with limited exceptions. Hover a card for what Salesforce runs, what is included for you to
+        configure, and the optional add-ons that can help you show the control. A product does not, by itself, meet the proposed rule.
       </p>
 
       <div class="stat-grid">
         <div class="stat-tile" style="animation-delay:.05s">
-          <div class="stat-label">Access</div>
-          <div class="stat-value">MFA Required</div>
-          <div class="stat-sub">Now mandatory, no longer "addressable"</div>
+          <div class="stat-label">Where it stands</div>
+          <div class="stat-value">July 2027</div>
+          <div class="stat-sub">Final-action target. Not the day controls turn on.</div>
         </div>
         <div class="stat-tile" style="animation-delay:.1s">
-          <div class="stat-label">Encryption</div>
-          <div class="stat-value">AES-256</div>
-          <div class="stat-sub">ePHI at rest &amp; in transit &middot; EKM</div>
+          <div class="stat-label">The shift</div>
+          <div class="stat-value">Required specs</div>
+          <div class="stat-sub">Addressable would end, with limited exceptions.</div>
         </div>
         <div class="stat-tile" style="animation-delay:.15s">
-          <div class="stat-label">Ransomware</div>
-          <div class="stat-value">72-Hour RTO</div>
-          <div class="stat-sub">Restore critical systems &middot; 48h RPO</div>
+          <div class="stat-label">Restore window</div>
+          <div class="stat-value">72 hours</div>
+          <div class="stat-sub">Certain critical systems and data. The proposal's number.</div>
         </div>
         <div class="stat-tile" style="animation-delay:.2s">
-          <div class="stat-label">Retention</div>
-          <div class="stat-value">6+ Years</div>
-          <div class="stat-sub">Immutable, reconstructable records</div>
+          <div class="stat-label">Backup currency</div>
+          <div class="stat-value">48 hours</div>
+          <div class="stat-sub">How current an ePHI copy would have to be.</div>
         </div>
       </div>
     </section>
 
     <!-- CFR section -->
     <div class="section-head">
-      <h2 class="section-title">The <em>CFR</em>, mapped to Salesforce security</h2>
-      <span class="section-hint">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
-        Hover any regulation to reveal its controls
-      </span>
+      <h2 class="section-title">Proposed changes, mapped to <em>Salesforce</em></h2>
+      <div class="legend">
+        <span class="platform">Platform · Salesforce runs it</span>
+        <span class="included">Included · you configure it</span>
+        <span class="addon">Add-on · separate license</span>
+      </div>
     </div>
 
     <div class="cfr-grid" id="cfrGrid"></div>
 
+    <section class="gap">
+      <h2>In the proposal, and <em>not a Salesforce setting.</em></h2>
+      <p class="gap-lead">These would sit with your security program. Work Salesforce does inside its own infrastructure stays on Salesforce's side of the shared-responsibility model. It does not segment your network, scan your workstations, or write your risk analysis.</p>
+      <ul>
+        <li>Anti-malware, removal of extraneous software, and disabling network ports according to your risk analysis.</li>
+        <li>Network segmentation.</li>
+        <li>Vulnerability scanning at least every 6 months, and penetration testing at least every 12 months. Health Check and Security Center do not run those tests.</li>
+        <li>The written risk analysis itself: the inventory, the threats, the vulnerabilities, and a risk level for each. A Health Check score is not that document.</li>
+        <li>A compliance audit at least every 12 months, and written policies, procedures, plans, and analyses.</li>
+        <li>A business associate's yearly written verification that it has deployed the technical safeguards, and notice within 24 hours if that associate activates its contingency plan.</li>
+        <li>Group health plans would put the safeguards into plan documents for their sponsors. That is a document change.</li>
+        <li>An AI tool that uses ePHI goes on the same inventory, under the same access and the same activity record. The proposal does not write a separate audit trail for AI.</li>
+      </ul>
+    </section>
+
     <footer class="footer">
       <p class="footer-note">
-        <b>Sources:</b> Modernization of the HIPAA Security Rule (internal, 2026); Salesforce Life Sciences Security &mdash; Securing MCP Connectors &amp; APIs (June 2026).
-        Regulatory context: HHS OCR HIPAA Security Rule NPRM (RIN 0945-AA22, published Jan 6, 2025). Note: the NPRM remains
-        <b>pending</b> as of mid-2026 and the current Security Rule remains in effect &mdash; the mandates shown reflect the modernized interpretation and recognized security practices.
+        <b>Sources:</b> HHS OCR fact sheet, December 27, 2024. NPRM, 90 FR 898, January 6, 2025, RIN 0945-AA22.
+        The Unified Agenda lists final action in July 2027. Legal deadline: none. The current Security Rule remains in effect.
+        A Business Associate Agreement covers the services on the covered-services list in the agreement you signed. This proposal's text is not already in that agreement. An AppExchange package is not covered automatically.
+        This page is not legal advice, and it is not a finding that a feature meets the proposal. Confirm the text with counsel.
       </p>
-      <span class="footer-brand">Salesforce Compliance</span>
+      <span class="footer-brand">Salesforce briefing</span>
     </footer>
   </main>
 
@@ -361,92 +411,110 @@
     namedCred: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M12 9.6V8.4M12 12l1.9 1.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
   };
 
-  /* ── Solution catalog ───────────────────────────────────────────────────── */
+  /* ── Controls. tier is platform | included | addon ──────────────────────── */
   const SOL = {
-    identity:        { name: 'Customer Identity',        desc: 'MFA &amp; adaptive access control',      color: '#3a7bd5', icon: ICON.identity },
-    securityCenter:  { name: 'Security Center',          desc: 'Tenant-wide posture &amp; config drift', color: '#2e9e6b', icon: ICON.securityCenter },
-    dataDetect:      { name: 'Shield: Data Detect',      desc: 'Finds hidden PHI in free text',          color: '#c75b2e', icon: ICON.dataDetect },
-    eventMonitoring: { name: 'Shield: Event Monitoring', desc: 'Per-event forensic activity logs',       color: '#7b5ea7', icon: ICON.eventMonitoring },
-    encryption:      { name: 'Shield: Platform Encryption', desc: 'AES-256 ePHI at rest &middot; EKM',   color: '#b8893b', icon: ICON.encryption },
-    auditTrail:      { name: 'Shield: Field Audit Trail', desc: 'Indefinite field-level history',        color: '#5e8c8c', icon: ICON.auditTrail },
-    backup:          { name: 'Salesforce Backup',        desc: 'Point-in-time recovery',                 color: '#4a90d9', icon: ICON.backup },
-    privacy:         { name: 'Privacy Center',           desc: 'Consent &amp; data-use policies',        color: '#9a7b9e', icon: ICON.privacy },
-    connectedApp:    { name: 'Connected Apps (JWT)',     desc: 'Per-agent scoped OAuth',                 color: '#d97a2e', icon: ICON.connectedApp },
-    namedCred:       { name: 'Named Credentials',        desc: 'Vaulted, rotated secrets',               color: '#6b7c5e', icon: ICON.namedCred }
+    tls:            { tier: 'platform', name: 'Transmission security',     desc: 'TLS for data moving between you and Salesforce. This is the service. It does not encrypt the fields you store.', color: '#3d5a80', icon: ICON.encryption },
+    resilience:     { tier: 'platform', name: 'Platform resilience',        desc: 'How Salesforce runs the service. Your 72-hour procedure is a document you write. This is not a recovery-time number.', color: '#3d5a80', icon: ICON.securityCenter },
+    mfa:            { tier: 'included', name: 'MFA and single sign-on',     desc: 'Salesforce requires MFA for user-interface logins. The second factor usually runs at your identity provider.', color: '#3a7bd5', icon: ICON.identity },
+    session:        { tier: 'included', name: 'Session settings',           desc: 'Timeout and login IP ranges, next to the sign-in. API users and integrations are a separate design.', color: '#3a7bd5', icon: ICON.identity },
+    access:         { tier: 'included', name: 'Profiles and permission sets', desc: 'Object rights, field-level security, and sharing. The job is a matrix you sign. These features show the grant.', color: '#2e6b4f', icon: ICON.identity },
+    classification: { tier: 'included', name: 'Data classification',        desc: 'Sensitivity, category, and owner on the field, in all editions. A label does not hide the field.', color: '#2e6b4f', icon: ICON.dataDetect },
+    loginHistory:   { tier: 'included', name: 'Login history',              desc: 'Who signed in. It is not the record of who opened a patient field.', color: '#5e8c8c', icon: ICON.eventMonitoring },
+    setupAudit:     { tier: 'included', name: 'Setup audit trail',          desc: 'Setup changes, kept 180 days. Removing access shows up here. The 24-hour notice is your letter.', color: '#5e8c8c', icon: ICON.auditTrail },
+    fieldHistory:   { tier: 'included', name: 'Field history',              desc: 'Up to 20 fields. About 18 months in the product, and up to 24 months through the API.', color: '#5e8c8c', icon: ICON.auditTrail },
+    healthCheck:    { tier: 'included', name: 'Health Check',               desc: 'A score for one org, against a baseline you can adjust. The score is not the written risk analysis.', color: '#2e9e6b', icon: ICON.securityCenter },
+    deactivate:     { tier: 'included', name: 'Deactivate the user',        desc: 'End access in the org the day you do it. Salesforce does not send the 24-hour notice to another entity.', color: '#3a7bd5', icon: ICON.identity },
+    encryption:     { tier: 'addon',    name: 'Shield Platform Encryption', desc: 'AES-256 at rest for the fields, files, or database you choose. Not every field type. Bring-your-own-key and external key management are optional.', color: '#b8893b', icon: ICON.encryption },
+    eventMonitoring:{ tier: 'addon',    name: 'Event Monitoring',           desc: 'Activity as it happens. A policy can alert where Transaction Security is entitled. Log files are kept one year by default.', color: '#7b5ea7', icon: ICON.eventMonitoring },
+    auditTrail:     { tier: 'addon',    name: 'Field Audit Trail',          desc: 'Up to 200 fields, kept until you delete it, starting the day you enable it. It does not backfill earlier history.', color: '#5e8c8c', icon: ICON.auditTrail },
+    dataDetect:     { tier: 'addon',    name: 'Data Detect',                desc: 'Finds sensitive values nobody tagged, including values in free text. The scan does not change who can read the field.', color: '#c75b2e', icon: ICON.dataDetect },
+    securityCenter: { tier: 'addon',    name: 'Security Center',            desc: 'Posture, drift, and classification across the Salesforce orgs you connect. Not the hospital inventory. It does not run a penetration test.', color: '#2e9e6b', icon: ICON.securityCenter },
+    whoSeesWhat:    { tier: 'addon',    name: 'Who Sees What Explorer',     desc: 'Comes with Security Center. Effective access, and which grant produced it. It does not decide what the job should have.', color: '#2e9e6b', icon: ICON.identity },
+    backup:         { tier: 'addon',    name: 'Backup and Recover',         desc: 'Scheduled backups and a restore of Salesforce data you can show. It does not restore the EHR, and it is not a quoted 72-hour or 48-hour commitment.', color: '#4a90d9', icon: ICON.backup }
   };
 
-  /* ── CFR regulation cards (pages 8-10 of HIPAA Rules + MCP/API deck) ─────── */
+  const TIER_LABEL = { platform: 'Platform', included: 'Included', addon: 'Add-on' };
+
+  /* ── Proposed changes. Each group is platform, included, or add-on. ─────── */
   const CFR = [
     {
-      code: '45 CFR §164.308', tag: 'Administrative Safeguards', color: '#6b7c5e',
-      icon: ICON.securityCenter,
-      name: 'Administrative Safeguards',
-      desc: 'Implement policies and procedures to prevent, detect, contain, and correct security violations. 2026 raises the floor with mandatory annual risk analysis and workforce MFA.',
-      sols: ['identity', 'securityCenter', 'dataDetect', 'eventMonitoring']
-    },
-    {
-      code: '45 CFR §164.310', tag: 'Physical Safeguards', color: '#8b7355',
-      icon: ICON.identity,
-      name: 'Physical Safeguards',
-      desc: 'Protect electronic information systems and related equipment from hazards and unauthorized intrusion &mdash; enforced through platform access, device, and configuration controls.',
-      sols: ['securityCenter', 'eventMonitoring', 'identity']
-    },
-    {
-      code: '45 CFR §164.312', tag: 'Technical Safeguards', color: '#c75b2e',
-      icon: ICON.encryption,
-      name: 'Technical Safeguards',
-      desc: 'Implement technology and policies to protect and control access to ePHI. In 2026, encryption at rest and in transit moves from "addressable" to required.',
-      sols: ['encryption', 'identity', 'eventMonitoring', 'securityCenter']
-    },
-    {
-      code: '45 CFR §164.316', tag: 'Documentation &amp; Retention', color: '#7a8f6e',
-      icon: ICON.auditTrail,
-      name: 'Documentation &amp; Retention',
-      desc: 'Retain all HIPAA policies, procedures, and audit records for a minimum of six years &mdash; with an immutable history that can reconstruct clinical data timelines during an investigation.',
-      sols: ['auditTrail', 'backup', 'securityCenter']
-    },
-    {
-      code: '45 CFR §164.400-414', tag: 'Breach Notification', color: '#a84a24',
-      icon: ICON.eventMonitoring,
-      name: 'Breach Notification',
-      desc: 'When a breach occurs, notify affected individuals and the HHS Secretary. Without a log from Event Monitoring you are interpreted as being in "willful neglect" &mdash; regardless of a signed BAA.',
-      sols: ['eventMonitoring', 'backup', 'securityCenter']
-    },
-    {
-      code: '45 CFR §164.520', tag: 'Notice of Privacy Practices', color: '#9a7b9e',
-      icon: ICON.privacy,
-      name: 'Notice of Privacy Practices',
-      desc: 'Govern how patient data is shared and disclosed. New NPP obligations follow the alignment of substance-use data with HIPAA, effective February 16, 2026.',
-      sols: ['privacy', 'dataDetect', 'securityCenter']
-    },
-    {
-      code: '42 CFR Part 2', tag: 'SUD Data Protection', color: '#5e8c8c',
+      code: 'Find it', tag: 'Inventory', color: '#2e9e6b',
       icon: ICON.dataDetect,
-      name: 'Substance-Use Disorder Data',
-      desc: 'Specialized safeguards for substance-use-disorder records, officially aligned with HIPAA on February 16, 2026 with stricter consent and minimum-necessary sharing.',
-      sols: ['privacy', 'encryption', 'identity', 'dataDetect']
+      name: 'Know where ePHI sits',
+      desc: 'The proposal would require a technology asset inventory and a network map of how ePHI moves, updated at least every 12 months and when the environment changes. Salesforce is one system on that map.',
+      groups: { included: ['classification'], addon: ['dataDetect', ['securityCenter', 'Classification across the Salesforce orgs you connect. Salesforce is still one system on your inventory.']] }
     },
     {
-      code: '21 CFR Part 11', tag: 'API &amp; MCP Traceability', color: '#b8893b',
-      icon: ICON.connectedApp,
-      name: 'Electronic Records &amp; API Access',
-      desc: 'ALCOA+ integrity for every API and MCP-server call touching regulated records &mdash; attributable, contemporaneous, immutable logs across REST, SOQL, Bulk, and Composite.',
-      sols: ['connectedApp', 'namedCred', 'eventMonitoring', 'securityCenter']
+      code: 'Limit it', tag: 'Access', color: '#3a7bd5',
+      icon: ICON.identity,
+      name: 'Only the access you grant',
+      desc: 'Access control is already required. The proposal would remove the option to treat an implementation specification as addressable. Who may open ePHI is still a decision you sign.',
+      groups: { included: ['access'], addon: ['whoSeesWhat'] }
+    },
+    {
+      code: 'Sign in', tag: 'Authentication', color: '#6b7c5e',
+      icon: ICON.identity,
+      name: 'Multi-factor authentication',
+      desc: 'The proposal would require MFA on technology assets in relevant electronic information systems, with limited exceptions. The Salesforce prompt covers user-interface logins. API users and integrations are part of the same design.',
+      groups: { included: ['mfa', 'session'] }
+    },
+    {
+      code: 'Lock it', tag: 'Encryption', color: '#c75b2e',
+      icon: ICON.encryption,
+      name: 'ePHI stored, and ePHI moving',
+      desc: 'The proposal would require encryption of ePHI at rest and in transit, using prevailing cryptographic standards, with limited exceptions. It does not name AES-256. Any exception is a written plan you keep.',
+      groups: { platform: ['tls'], addon: ['encryption'] }
+    },
+    {
+      code: 'Watch it', tag: 'Activity', color: '#7b5ea7',
+      icon: ICON.eventMonitoring,
+      name: 'A record as the activity happens',
+      desc: 'The proposal would require a record of activity in systems that hold ePHI, written as it happens, and a written way to respond when it looks unauthorized. The incident-response plan stays yours.',
+      groups: { included: ['loginHistory', 'setupAudit', 'fieldHistory'], addon: ['eventMonitoring', 'auditTrail'] }
+    },
+    {
+      code: 'Get it back', tag: 'Recovery', color: '#4a90d9',
+      icon: ICON.backup,
+      name: 'Restore what you marked critical',
+      desc: 'The proposal would require written procedures to restore certain critical systems and data within 72 hours, a criticality order for the rest, and backup copies of ePHI no more than 48 hours older than the live data. Restores would be tested, with backup controls separated from the live systems. Seventy-two and forty-eight are the proposal\'s numbers.',
+      groups: { platform: ['resilience'], addon: ['backup'] }
+    },
+    {
+      code: 'Review it', tag: 'Review', color: '#8b7355',
+      icon: ICON.securityCenter,
+      name: 'A review you can show',
+      desc: 'The proposal would require a more specific written risk analysis, a compliance audit at least every 12 months, and a review and test of certain security measures at least every 12 months. Vulnerability scanning and penetration testing are in the proposal too. They are listed below, because they are not a Salesforce setup page.',
+      groups: { included: ['healthCheck'], addon: ['securityCenter'] }
+    },
+    {
+      code: 'End access', tag: 'Workforce access', color: '#a84a24',
+      icon: ICON.auditTrail,
+      name: 'Notice within 24 hours',
+      desc: 'The proposal would require notice to certain other regulated entities within 24 hours when a workforce member\'s access to ePHI, or to certain systems, is changed or terminated. The notice is yours to send.',
+      groups: { included: ['deactivate', 'setupAudit'], addon: [['eventMonitoring', 'Can show activity around the access change. It does not send the 24-hour notice.']] }
     }
   ];
 
   /* ── Render ─────────────────────────────────────────────────────────────── */
   const grid = document.getElementById('cfrGrid');
   grid.innerHTML = CFR.map((r, i) => {
-    const sols = r.sols.map((k, j) => {
-      const s = SOL[k];
-      return `<div class="sol" style="--sc:${s.color}; transition-delay:${0.05 + j * 0.06}s">
-                <div class="sol-icon">${s.icon}</div>
-                <div class="sol-text">
-                  <span class="sol-name">${s.name}</span>
-                  <span class="sol-desc">${s.desc}</span>
-                </div>
-              </div>`;
+    let n = 0;
+    const sols = ['platform', 'included', 'addon'].map(tier => {
+      const keys = (r.groups[tier] || []);
+      if (!keys.length) return '';
+      const rows = keys.map(k => {
+        const s = Array.isArray(k) ? { ...SOL[k[0]], desc: k[1] } : SOL[k];
+        const delay = 0.05 + n * 0.06;
+        n += 1;
+        return `<div class="sol" style="--sc:${s.color}; transition-delay:${delay}s">
+                  <div class="sol-icon">${s.icon}</div>
+                  <div class="sol-text">
+                    <span class="sol-name">${s.name}</span>
+                    <span class="sol-desc">${s.desc}</span>
+                  </div>
+                </div>`;
+      }).join('');
+      return `<div class="tier-label ${tier}">${TIER_LABEL[tier]}</div>${rows}`;
     }).join('');
     return `
       <article class="cfr-card" tabindex="0" style="--c:${r.color}; animation-delay:${0.08 + i * 0.05}s">
@@ -463,10 +531,10 @@
           <p class="cfr-desc">${r.desc}</p>
           <span class="cfr-reveal-hint">
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-            Hover for Salesforce controls
+            Hover for platform, included, and add-ons
           </span>
           <div class="cfr-solutions">
-            <div class="cfr-solutions-label">Salesforce security &rarr; <b>${r.sols.length} controls</b></div>
+            <div class="cfr-solutions-label">Can help you show this &rarr; <b>${n} controls</b></div>
             ${sols}
           </div>
         </div>
@@ -478,7 +546,7 @@
   if (isTouch) {
     document.querySelectorAll('.cfr-card').forEach(card => {
       const hint = card.querySelector('.cfr-reveal-hint');
-      if (hint && hint.lastChild) hint.lastChild.textContent = ' Tap for Salesforce controls';
+      if (hint && hint.lastChild) hint.lastChild.textContent = ' Tap for platform, included, and add-ons';
       card.setAttribute('role', 'button');
       card.setAttribute('aria-expanded', 'false');
       const toggle = () => {
